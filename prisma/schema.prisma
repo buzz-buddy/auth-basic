@@ -11,18 +11,46 @@ enum Role {
   ADMIN
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
 
-  refreshTokens RefreshToken[]
+model User {
+  id                String     @id @default(cuid())
+  email             String     @unique
+  password          String
+  role              Role       @default(USER)
+  firstName         String?
+  lastName          String?
+  displayName       String?
+  avatarUrl         String?
+  dateOfBirth       DateTime?  @db.Date
+  status            UserStatus @default(ACTIVE)
+  emailVerified     Boolean    @default(false)
+  emailVerifiedAt   DateTime?
+  lastLoginAt       DateTime?
+  passwordChangedAt DateTime?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  refreshTokens            RefreshToken[]
+  emailVerificationTokens  EmailVerificationToken[]
 }
 
 model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
   id        String   @id @default(cuid())
   tokenHash String   @unique
   userId    String

@@ -1,20 +1,6 @@
-import {
-  IsDateString,
-  IsEmail,
-  IsOptional,
-  IsString,
-  IsUrl,
-  MinLength,
-} from 'class-validator';
+import { IsDateString, IsOptional, IsString, IsUrl } from 'class-validator';
 
-export class RegisterDto {
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  @MinLength(8)
-  password: string;
-
+export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   firstName?: string;
