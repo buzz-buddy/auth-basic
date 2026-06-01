@@ -1,37 +1,15 @@
-import {
-  IsDateString,
-  IsEmail,
-  IsOptional,
-  IsString,
-  IsUrl,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsString, MinLength } from 'class-validator';
+import { UserProfileFieldsDto } from '../../users/dto/user-profile-fields.dto';
 
-export class RegisterDto {
+/**
+ * Signup: email and password are required; all profile fields are optional
+ * (same set as PATCH /users/me).
+ */
+export class RegisterDto extends UserProfileFieldsDto {
   @IsEmail()
   email: string;
 
   @IsString()
   @MinLength(8)
   password: string;
-
-  @IsOptional()
-  @IsString()
-  firstName?: string;
-
-  @IsOptional()
-  @IsString()
-  lastName?: string;
-
-  @IsOptional()
-  @IsString()
-  displayName?: string;
-
-  @IsOptional()
-  @IsUrl()
-  avatarUrl?: string;
-
-  @IsOptional()
-  @IsDateString()
-  dateOfBirth?: string;
 }

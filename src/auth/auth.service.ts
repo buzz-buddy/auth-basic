@@ -14,9 +14,13 @@ import { userPublicSelect } from '../common/types/user-public.type';
 import { JwtPayload } from '../common/types/jwt-payload.type';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
+import { MailService } from '../mail/mail.service';
+import { profileFieldsFromDto } from '../users/profile-fields.util';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 
 export type AuthTokens = {
@@ -33,6 +37,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private prisma: PrismaService,
+    private mailService: MailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -47,16 +52,14 @@ export class AuthService {
       this.configService.get('EMAIL_VERIFICATION_EXPIRES_IN', '24h'),
     );
 
+    const profile = profileFieldsFromDto(dto);
+
     const user = await this.prisma.$transaction(async (tx) => {
       const created = await tx.user.create({
         data: {
           email: dto.email,
           password: passwordHash,
-          firstName: dto.firstName,
-          lastName: dto.lastName,
-          displayName: dto.displayName,
-          avatarUrl: dto.avatarUrl,
-          dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
+          ...profile,
           status: UserStatus.ACTIVE,
           emailVerified: false,
         },
@@ -74,24 +77,23 @@ export class AuthService {
       return created;
     });
 
+    await this.mailService.sendEmailVerificationEmail(
+      user.email,
+      verificationToken,
+    );
+
     const tokens = await this.issueTokens(
       user.id,
       user.email,
       user.role as Role,
     );
 
-    const response: Record<string, unknown> = {
+    return {
       message:
-        'Registration successful. Email verification is optional for now.',
-      user,
+        'Registration successful. Check your email for a verification link.',
+      user: await this.usersService.toPublicUser(user),
       ...tokens,
     };
-
-    if (this.configService.get('NODE_ENV') !== 'production') {
-      response.verificationToken = verificationToken;
-    }
-
-    return response;
   }
 
   async verifyEmail(dto: VerifyEmailDto) {
@@ -164,12 +166,12 @@ export class AuthService {
       }),
     ]);
 
-    const response: Record<string, unknown> = { message: genericMessage };
-    if (this.configService.get('NODE_ENV') !== 'production') {
-      response.verificationToken = verificationToken;
-    }
+    await this.mailService.sendEmailVerificationEmail(
+      user.email,
+      verificationToken,
+    );
 
-    return response;
+    return { message: genericMessage };
   }
 
   async login(dto: LoginDto) {
@@ -216,6 +218,74 @@ export class AuthService {
     const tokenHash = this.hashToken(refreshToken);
     await this.prisma.refreshToken.deleteMany({ where: { tokenHash } });
     return { success: true };
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const genericMessage =
+      'If an account with that email exists, a password reset link has been sent.';
+
+    const user = await this.usersService.findByEmail(dto.email);
+    if (!user || user.status === UserStatus.SUSPENDED) {
+      return { message: genericMessage };
+    }
+
+    const resetToken = randomBytes(32).toString('base64url');
+    const expiresAt = this.parseDurationToDate(
+      this.configService.get('PASSWORD_RESET_EXPIRES_IN', '1h'),
+    );
+
+    await this.prisma.$transaction([
+      this.prisma.passwordResetToken.deleteMany({
+        where: { userId: user.id },
+      }),
+      this.prisma.passwordResetToken.create({
+        data: {
+          tokenHash: this.hashToken(resetToken),
+          userId: user.id,
+          expiresAt,
+        },
+      }),
+    ]);
+
+    await this.mailService.sendPasswordResetEmail(user.email, resetToken);
+
+    return { message: genericMessage };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const tokenHash = this.hashToken(dto.token);
+    const stored = await this.prisma.passwordResetToken.findUnique({
+      where: { tokenHash },
+      include: { user: true },
+    });
+
+    if (!stored || stored.expiresAt < new Date()) {
+      throw new UnauthorizedException('Invalid or expired reset token');
+    }
+
+    if (stored.user.status === UserStatus.SUSPENDED) {
+      throw new ForbiddenException('Account suspended');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, this.bcryptRounds);
+
+    await this.prisma.$transaction([
+      this.prisma.passwordResetToken.deleteMany({
+        where: { userId: stored.userId },
+      }),
+      this.prisma.refreshToken.deleteMany({
+        where: { userId: stored.userId },
+      }),
+      this.prisma.user.update({
+        where: { id: stored.userId },
+        data: {
+          password: passwordHash,
+          passwordChangedAt: new Date(),
+        },
+      }),
+    ]);
+
+    return { message: 'Password reset successful' };
   }
 
   private assertAccountCanAuthenticate(user: { status: UserStatus }) {

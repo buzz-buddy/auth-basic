@@ -1,23 +1,3 @@
-import { IsDateString, IsOptional, IsString, IsUrl } from 'class-validator';
+import { UserProfileFieldsDto } from './user-profile-fields.dto';
 
-export class UpdateProfileDto {
-  @IsOptional()
-  @IsString()
-  firstName?: string;
-
-  @IsOptional()
-  @IsString()
-  lastName?: string;
-
-  @IsOptional()
-  @IsString()
-  displayName?: string;
-
-  @IsOptional()
-  @IsUrl()
-  avatarUrl?: string;
-
-  @IsOptional()
-  @IsDateString()
-  dateOfBirth?: string;
-}
+export class UpdateProfileDto extends UserProfileFieldsDto {}
