@@ -1,9 +1,12 @@
 import {
-  ConflictException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import {
+  badRequestWithFieldErrors,
+  conflictWithFieldErrors,
+} from '../common/exceptions/field-http.exception';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserStatus } from '@prisma/client';
@@ -43,7 +46,10 @@ export class AuthService {
   async register(dto: RegisterDto) {
     const existing = await this.usersService.findByEmail(dto.email);
     if (existing) {
-      throw new ConflictException('Email already registered');
+      throw conflictWithFieldErrors(
+        { email: ['Email already registered'] },
+        'Registration failed',
+      );
     }
 
     const passwordHash = await bcrypt.hash(dto.password, this.bcryptRounds);
@@ -260,7 +266,10 @@ export class AuthService {
     });
 
     if (!stored || stored.expiresAt < new Date()) {
-      throw new UnauthorizedException('Invalid or expired reset token');
+      throw badRequestWithFieldErrors(
+        { token: ['Invalid or expired reset token'] },
+        'Password reset failed',
+      );
     }
 
     if (stored.user.status === UserStatus.SUSPENDED) {

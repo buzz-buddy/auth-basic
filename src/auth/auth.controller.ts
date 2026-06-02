@@ -8,7 +8,20 @@ import {
   Res,
   UnauthorizedException,
 } from '@nestjs/common';
+import {
+  ApiCookieAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Request, Response } from 'express';
+import {
+  AccessTokenResponseDto,
+  LogoutResponseDto,
+  MessageResponseDto,
+  RegisterResponseDto,
+  ValidationErrorResponseDto,
+} from '../common/swagger/api-responses.dto';
 import { Public } from './decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
@@ -19,6 +32,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { RefreshTokenCookieService } from './refresh-token-cookie.service';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -28,6 +42,26 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @ApiOperation({
+    summary: 'Register a new account',
+    description:
+      'Creates a user, sends a verification email, returns `accessToken`, and sets the refresh token cookie.',
+  })
+  @ApiCookieAuth('refresh-cookie')
+  @ApiResponse({ status: 201, type: RegisterResponseDto })
+  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
+  @ApiResponse({
+    status: 409,
+    description: 'Email already registered',
+    schema: {
+      example: {
+        statusCode: 409,
+        message: 'Registration failed',
+        error: 'Conflict',
+        errors: { email: ['Email already registered'] },
+      },
+    },
+  })
   async register(
     @Body() dto: RegisterDto,
     @Res({ passthrough: true }) res: Response,
@@ -41,6 +75,14 @@ export class AuthController {
   @Public()
   @Post('verify-email')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Verify email with token from link',
+    description: 'Token comes from the `?token=` query param in the verification email.',
+  })
+  @ApiCookieAuth('refresh-cookie')
+  @ApiResponse({ status: 200, type: AccessTokenResponseDto })
+  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Invalid or expired verification token' })
   async verifyEmail(
     @Body() dto: VerifyEmailDto,
     @Res({ passthrough: true }) res: Response,
@@ -53,6 +95,9 @@ export class AuthController {
   @Public()
   @Post('resend-verification')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Resend email verification link' })
+  @ApiResponse({ status: 200, type: MessageResponseDto })
+  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
   resendVerification(@Body() dto: ResendVerificationDto) {
     return this.authService.resendVerification(dto);
   }
@@ -60,6 +105,15 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Log in',
+    description: 'Returns `accessToken` and sets the refresh token httpOnly cookie.',
+  })
+  @ApiCookieAuth('refresh-cookie')
+  @ApiResponse({ status: 200, type: AccessTokenResponseDto })
+  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiResponse({ status: 403, description: 'Account suspended' })
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
@@ -72,6 +126,14 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Refresh access token',
+    description:
+      'Requires the refresh token cookie. No request body. Returns a new `accessToken` and rotates the cookie.',
+  })
+  @ApiCookieAuth('refresh-cookie')
+  @ApiResponse({ status: 200, type: AccessTokenResponseDto })
+  @ApiResponse({ status: 401, description: 'Refresh token missing or invalid' })
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = this.refreshCookie.read(req);
     if (!refreshToken) {
@@ -86,6 +148,12 @@ export class AuthController {
   @Public()
   @Post('logout')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Log out',
+    description: 'Invalidates the refresh token cookie server-side and clears the cookie.',
+  })
+  @ApiCookieAuth('refresh-cookie')
+  @ApiResponse({ status: 200, type: LogoutResponseDto })
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = this.refreshCookie.read(req);
     if (refreshToken) {
@@ -98,6 +166,9 @@ export class AuthController {
   @Public()
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request password reset email' })
+  @ApiResponse({ status: 200, type: MessageResponseDto })
+  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.authService.forgotPassword(dto);
   }
@@ -105,6 +176,10 @@ export class AuthController {
   @Public()
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password with token from email' })
+  @ApiResponse({ status: 200, type: MessageResponseDto })
+  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
+  @ApiResponse({ status: 403, description: 'Account suspended' })
   async resetPassword(
     @Body() dto: ResetPasswordDto,
     @Res({ passthrough: true }) res: Response,
