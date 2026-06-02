@@ -20,6 +20,7 @@ import {
   LogoutResponseDto,
   MessageResponseDto,
   RegisterResponseDto,
+  UnauthorizedResponseDto,
   ValidationErrorResponseDto,
 } from '../common/swagger/api-responses.dto';
 import { Public } from './decorators/public.decorator';
@@ -32,7 +33,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { RefreshTokenCookieService } from './refresh-token-cookie.service';
 
-@ApiTags('auth')
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -45,7 +46,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Register a new account',
     description:
-      'Creates a user, sends a verification email, returns `accessToken`, and sets the refresh token cookie.',
+      'Creates a user, sends a verification email, returns `accessToken`, and a user object and sets the refresh token cookie.',
   })
   @ApiCookieAuth('refresh-cookie')
   @ApiResponse({ status: 201, type: RegisterResponseDto })
@@ -81,8 +82,31 @@ export class AuthController {
   })
   @ApiCookieAuth('refresh-cookie')
   @ApiResponse({ status: 200, type: AccessTokenResponseDto })
-  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
-  @ApiResponse({ status: 401, description: 'Invalid or expired verification token' })
+  @ApiResponse({
+    status: 400,
+    description: 'Missing token in request body',
+    schema: {
+      example: {
+        errors: {
+          token: ['token is required'],
+        },
+        statusCode: 400,
+        message: 'Validation failed',
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired verification token',
+    schema: {
+      example: {
+        statusCode: 401,
+        message: 'Invalid or expired verification token',
+        error: 'Unauthorized',
+      },
+    },
+  })
   async verifyEmail(
     @Body() dto: VerifyEmailDto,
     @Res({ passthrough: true }) res: Response,
@@ -96,8 +120,8 @@ export class AuthController {
   @Post('resend-verification')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Resend email verification link' })
-  @ApiResponse({ status: 200, type: MessageResponseDto })
-  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
+  @ApiResponse({ status: 200, schema: { example: { message: 'If the account exists and is unverified, a new verification email has been sent.' } } })
+  @ApiResponse({ status: 400, schema: { example: { errors: { email: ['email is required'] }, statusCode: 400, message: 'Validation failed', error: 'Bad Request' } } })
   resendVerification(@Body() dto: ResendVerificationDto) {
     return this.authService.resendVerification(dto);
   }
@@ -107,13 +131,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Log in',
-    description: 'Returns `accessToken` and sets the refresh token httpOnly cookie.',
+    description: 'Returns `accessToken` with user object and sets the refresh token httpOnly cookie.',
   })
   @ApiCookieAuth('refresh-cookie')
   @ApiResponse({ status: 200, type: AccessTokenResponseDto })
   @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  @ApiResponse({ status: 403, description: 'Account suspended' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials', schema: { example: { statusCode: 401, message: 'Invalid credentials', error: 'Unauthorized' } } })
+  @ApiResponse({ status: 403, description: 'Account suspended', schema: { example: { statusCode: 403, message: 'Account suspended', error: 'Forbidden' } } })
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
@@ -133,7 +157,7 @@ export class AuthController {
   })
   @ApiCookieAuth('refresh-cookie')
   @ApiResponse({ status: 200, type: AccessTokenResponseDto })
-  @ApiResponse({ status: 401, description: 'Refresh token missing or invalid' })
+  @ApiResponse({ status: 401, description: 'Refresh token missing or invalid', schema: { example: { statusCode: 401, message: 'Refresh token missing', error: 'Unauthorized' } } })
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = this.refreshCookie.read(req);
     if (!refreshToken) {
@@ -167,8 +191,8 @@ export class AuthController {
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request password reset email' })
-  @ApiResponse({ status: 200, type: MessageResponseDto })
-  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
+  @ApiResponse({ status: 200, schema: { example: { message: 'If an account with that email exists, a password reset link has been sent.' } } })
+  @ApiResponse({ status: 400, schema: { example: { errors: { email: ['email is required'] }, statusCode: 400, message: 'Validation failed', error: 'Bad Request' } } })
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.authService.forgotPassword(dto);
   }
@@ -177,9 +201,9 @@ export class AuthController {
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password with token from email' })
-  @ApiResponse({ status: 200, type: MessageResponseDto })
-  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
-  @ApiResponse({ status: 403, description: 'Account suspended' })
+  @ApiResponse({ status: 200, schema: { example: { message: 'Password reset successful' } } })
+  @ApiResponse({ status: 400, schema: { example: { errors: { token: ['token is invalid'], password: ['password is required'] }, statusCode: 400, message: 'Validation failed', error: 'Bad Request' } } })
+  @ApiResponse({ status: 403, description: 'Account suspended', schema: { example: { statusCode: 403, message: 'Account suspended', error: 'Forbidden' } } })
   async resetPassword(
     @Body() dto: ResetPasswordDto,
     @Res({ passthrough: true }) res: Response,

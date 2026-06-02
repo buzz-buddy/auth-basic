@@ -9,10 +9,10 @@ export function setupSwagger(app: INestApplication) {
   const document = SwaggerModule.createDocument(
     app,
     new DocumentBuilder()
-      .setTitle('Auth Basic API')
+      .setTitle('Buzzzzed backend API documentation')
       .setDescription(
         [
-          'REST API for authentication, user profiles, and avatar uploads.',
+          'REST API for authentication, user profiles. This API is used to manage the backend of the Buzzzzed platform.',
           '',
           '**Authentication**',
           '- After login/register/verify-email/refresh, the **refresh token** is set in an httpOnly cookie (`' +

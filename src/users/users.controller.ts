@@ -38,14 +38,14 @@ import { UsersService } from './users.service';
 const AVATAR_MAX_BYTES = 5 * 1024 * 1024;
 const AVATAR_MAX_SIZE_LABEL = '5 MB';
 
-@ApiTags('users')
+@ApiTags('User Profiles')
 @ApiBearerAuth('access-token')
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get('me')
-  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiOperation({ summary: 'Get current user profile', description: 'Returns the current user profile.' })
   @ApiResponse({ status: 200, type: UserPublicDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getProfile(@CurrentUser() user: AuthenticatedUser) {

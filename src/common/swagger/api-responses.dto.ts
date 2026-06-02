@@ -19,6 +19,17 @@ export class ValidationErrorResponseDto extends FieldErrorsDto {
   error: string;
 }
 
+export class UnauthorizedResponseDto {
+  @ApiProperty({ example: 401 })
+  statusCode: number;
+
+  @ApiProperty({ example: 'Unauthorized' })
+  message: string;
+
+  @ApiProperty({ example: 'Unauthorized' })
+  error: string;
+}
+
 export class AccessTokenResponseDto {
   @ApiProperty({
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
