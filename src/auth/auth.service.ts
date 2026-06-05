@@ -65,6 +65,7 @@ export class AuthService {
         data: {
           email: dto.email,
           password: passwordHash,
+          role: Role.USER,
           ...profile,
           status: UserStatus.ACTIVE,
           emailVerified: false,

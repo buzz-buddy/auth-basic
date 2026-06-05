@@ -23,10 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../common/enums/role.enum';
 import {
-  MessageResponseDto,
   UserPublicDto,
   ValidationErrorResponseDto,
 } from '../common/swagger/api-responses.dto';
@@ -114,14 +111,5 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   removeAvatar(@CurrentUser() user: AuthenticatedUser) {
     return this.usersService.removeAvatar(user.sub);
-  }
-
-  @Roles(Role.ADMIN)
-  @Get('admin-only')
-  @ApiOperation({ summary: 'Admin-only test route' })
-  @ApiResponse({ status: 200, type: MessageResponseDto })
-  @ApiResponse({ status: 403, description: 'Forbidden' })
-  adminOnly() {
-    return { message: 'Admin access granted' };
   }
 }
