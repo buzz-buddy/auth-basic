@@ -28,7 +28,18 @@
               "label": "Business Category",
               "isRequired": true,
               "fieldConfig": {
-                "options": ["Agency", "Enterprise"]
+                "options": [
+                  "Agency",
+                  "Founder / Personal Brand",
+                  "Celebrity",
+                  "E-commerce Brand",
+                  "Creator / Influencer",
+                  "Corporate / Enterprise",
+                  "Startup",
+                  "Non-Profit",
+                  "Consultant",
+                  "Coach / Mentor"
+                ]
               }
             },
             {
@@ -54,7 +65,12 @@
               "fieldConfig": {
                 "options": [
                   ["English (US)", "icon.png"],
-                  ["English (UK)", "icon.png"]
+                  ["English (UK)", "icon.png"],
+                  ["Spanish", "icon.png"],
+                  ["French", "icon.png"],
+                  ["German", "icon.png"],
+                  ["Arabic", "icon.png"],
+                  ["Other", "icon.png"]
                 ]
               }
             },
@@ -64,7 +80,16 @@
               "label": "Primary Market",
               "isRequired": true,
               "fieldConfig": {
-                "options": ["Global", "United States"]
+                "options": [
+                  "Global",
+                  "United States",
+                  "Europe",
+                  "Middle East",
+                  "South Asia",
+                  "Southeast Asia",
+                  "Africa",
+                  "Latin America"
+                ]
               }
             }
           ]
@@ -91,8 +116,13 @@
               "isRequired": true,
               "fieldConfig": {
                 "options": [
+                  "Services",
+                  "Physical products",
+                  "Digital products",
                   "SaaS Platform / Subscription Software",
-                  "Ecommerce website"
+                  "Content / Media",
+                  "Education / Courses",
+                  "Mixed"
                 ]
               }
             },
@@ -196,6 +226,174 @@
               "label": "Brand Promise",
               "isRequired": true,
               "fieldConfig": { "max": 250 }
+            }
+          ]
+        },
+        {
+          "slug": "brand_personality",
+          "label": "Brand Personality",
+          "title": "Brand Personality",
+          "description": "Define your brand archetype, tone, and personality dimensions.",
+          "sideInfo": "",
+          "sortOrder": 4,
+          "personaQuestions": [
+            {
+              "name": "brand_archetype",
+              "fieldType": "multi_radio_with_brief",
+              "label": "Brand Archetype",
+              "isRequired": true,
+              "fieldConfig": {
+                "max": 1,
+                "min": null,
+                "options": [
+                  ["Hero", "Courageous, determined, driven to overcome challenges"],
+                  ["Sage", "Wise, trusted, knowledge-driven authority"],
+                  ["Outlaw", "Rebellious, disruptive, challenges the status quo"],
+                  ["Creator", "Imaginative, artistic, builds things with meaning"],
+                  ["Caregiver", "Nurturing, supportive, puts others first"],
+                  ["Ruler", "Commanding, prestigious, establishes order"],
+                  ["Magician", "Transformative, visionary, makes dreams happen"],
+                  ["Innocent", "Optimistic, pure, simple and honest"],
+                  ["Explorer", "Adventurous, pioneering, seeks new experiences"],
+                  ["Lover", "Passionate, intimate, creates deep connections"],
+                  ["Jester", "Playful, humorous, brings joy and lightness"],
+                  ["Everyman", "Relatable, down-to-earth, inclusive and authentic"]
+                ]
+              }
+            },
+            {
+              "name": "tone_attributes",
+              "fieldType": "multi_radio",
+              "label": "Tone Attributes",
+              "isRequired": true,
+              "fieldConfig": {
+                "max": 4,
+                "min": null,
+                "options": [
+                  "Professional",
+                  "Casual & Friendly",
+                  "Bold & Edgy",
+                  "Educational",
+                  "Inspirational",
+                  "Humorous",
+                  "Authoritative",
+                  "Empathetic",
+                  "Witty",
+                  "Premium",
+                  "Warm",
+                  "Confident"
+                ]
+              }
+            },
+            {
+              "name": "personality_sliders",
+              "fieldType": "multi_slider",
+              "label": "Personality Sliders",
+              "isRequired": true,
+              "fieldConfig": {
+                "max": null,
+                "min": 2,
+                "options": [
+                  ["Formal", "Casual"],
+                  ["Serious", "Playful"],
+                  ["Reserved", "Bold"],
+                  ["Traditional", "Modern"],
+                  ["Corporate", "Friendly"],
+                  ["Premium", "Accessible"]
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "slug": "founder_voice",
+          "label": "Founder Voice",
+          "title": "Founder Voice",
+          "description": "Does a founder or CEO have a personal voice that should appear in content?",
+          "sideInfo": "",
+          "sortOrder": 5,
+          "personaQuestions": [
+            {
+              "name": "include_founder_voice",
+              "fieldType": "radio",
+              "label": "Include founder voice in content?",
+              "isRequired": true,
+              "fieldConfig": {
+                "options": [
+                  "Yes",
+                  "No"
+                ]
+              }
+            },
+            {
+              "name": "founder_name",
+              "fieldType": "text",
+              "label": "Founder Name",
+              "isRequired": true,
+              "fieldConfig": { "max": 250 }
+            },
+            {
+              "name": "founder_role",
+              "fieldType": "single_dropdown",
+              "label": "Founder Role",
+              "isRequired": true,
+              "fieldConfig": {
+                "options": [
+                  "Founder",
+                  "CEO",
+                  "CTO",
+                  "CMO",
+                  "Creative Director",
+                  "Author",
+                  "Expert",
+                  "Coach",
+                  "Other"
+                ]
+              }
+            },
+            {
+              "name": "appears_in_content",
+              "fieldType": "single_dropdown",
+              "label": "Appears in content",
+              "isRequired": false,
+              "fieldConfig": {
+                "options": [
+                  "Always",
+                  "Often",
+                  "Sometimes",
+                  "Rarely",
+                  "Never"
+                ]
+              }
+            },
+            {
+              "name": "founder_tone_style",
+              "fieldType": "single_dropdown",
+              "label": "Founder Tone Style",
+              "isRequired": false,
+              "fieldConfig": {
+                "options": [
+                  "Same as brand voice",
+                  "More personal / raw",
+                  "More polished / executive",
+                  "Storytelling-led",
+                  "Educational-led"
+                ]
+              }
+            },
+            {
+              "name": "founder_bio",
+              "fieldType": "textarea",
+              "label": "Founder Bio",
+              "isRequired": false,
+              "fieldConfig": { "max": 500 }
+            },
+            {
+              "name": "founder_photo_library",
+              "fieldType": "file_upload_multiple",
+              "label": "Founder Photo Library",
+              "isRequired": false,
+              "fieldConfig": { "max": 5, "sizeLimit": 10485760, "allowedFileTypes": ["image/jpeg", "image/png", "image/webp"] }
             }
           ]
         }
