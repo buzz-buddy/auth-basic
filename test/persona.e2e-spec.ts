@@ -1,0 +1,173 @@
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import request from 'supertest';
+import { App } from 'supertest/types';
+import { AppModule } from '../src/app.module';
+import { validationExceptionFactory } from '../src/common/validation/validation-exception.factory';
+import { MailService } from '../src/mail/mail.service';
+
+describe('Persona (e2e)', () => {
+  jest.setTimeout(30_000);
+
+  let app: INestApplication<App>;
+  let accessToken: string;
+  let personaQuestionId: number;
+  let personaComponentId: number;
+  let personaSubComponentId: number;
+
+  const email = `persona-e2e-${Date.now()}@example.com`;
+  const password = 'password123';
+
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(MailService)
+      .useValue({
+        sendEmailVerificationEmail: jest.fn().mockResolvedValue(undefined),
+        sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
+      })
+      .compile();
+
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+        stopAtFirstError: true,
+        skipMissingProperties: false,
+        exceptionFactory: validationExceptionFactory,
+      }),
+    );
+    await app.init();
+
+    const registerRes = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({ email, password })
+      .expect(201);
+
+    accessToken = registerRes.body.accessToken;
+    expect(accessToken).toBeDefined();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('GET /workspaces/me returns workspace with persona resume', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/workspaces/me')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(res.body.id).toBeDefined();
+    expect(res.body.persona).toMatchObject({
+      status: 'DRAFT',
+      schemaVersion: 1,
+    });
+    expect(res.body.persona.resume).toMatchObject({
+      personaComponentId: expect.any(Number),
+      personaSubComponentId: expect.any(Number),
+    });
+
+    personaComponentId = res.body.persona.resume.personaComponentId;
+    personaSubComponentId = res.body.persona.resume.personaSubComponentId;
+  });
+
+  it('GET /workspaces/me/persona/schema returns personaComponents tree', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/workspaces/me/persona/schema')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(res.body.schemaVersion).toBe(1);
+    expect(Array.isArray(res.body.personaComponents)).toBe(true);
+    expect(res.body.personaComponents.length).toBeGreaterThan(0);
+
+    const firstComponent = res.body.personaComponents[0];
+    expect(firstComponent.personaSubComponents.length).toBeGreaterThan(0);
+
+    const firstSub = firstComponent.personaSubComponents[0];
+    expect(firstSub.personaQuestions.length).toBeGreaterThan(0);
+
+    personaQuestionId = firstSub.personaQuestions[0].id;
+    expect(firstSub.personaQuestions[0]).toHaveProperty('userResponse');
+    expect(firstSub.personaQuestions[0]).toHaveProperty('aiValue');
+  });
+
+  it('GET sub-component page returns personaQuestions with responses', async () => {
+    const res = await request(app.getHttpServer())
+      .get(
+        `/workspaces/me/persona/schema/persona-components/${personaComponentId}/persona-sub-components/${personaSubComponentId}`,
+      )
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(res.body.id).toBe(personaSubComponentId);
+    expect(res.body.personaQuestions.length).toBeGreaterThan(0);
+  });
+
+  it('PUT /workspaces/me/persona/responses saves userResponse', async () => {
+    const res = await request(app.getHttpServer())
+      .put('/workspaces/me/persona/responses')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        personaSubComponentId,
+        responses: [
+          {
+            personaQuestionId,
+            userResponse: 'Acme Corp',
+          },
+        ],
+      })
+      .expect(200);
+
+    expect(res.body.success).toBe(true);
+
+    const schemaRes = await request(app.getHttpServer())
+      .get(
+        `/workspaces/me/persona/schema/persona-components/${personaComponentId}/persona-sub-components/${personaSubComponentId}`,
+      )
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    const question = schemaRes.body.personaQuestions.find(
+      (q: { id: number }) => q.id === personaQuestionId,
+    );
+    expect(question.userResponse).toBe('Acme Corp');
+  });
+
+  it('PATCH /workspaces/me/persona/location updates resume', async () => {
+    const res = await request(app.getHttpServer())
+      .patch('/workspaces/me/persona/location')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ personaSubComponentId })
+      .expect(200);
+
+    expect(res.body.resume.personaSubComponentId).toBe(personaSubComponentId);
+  });
+
+  it('admin can update PersonaQuestion label', async () => {
+    const adminEmail = process.env.BOOTSTRAP_ADMIN_EMAIL;
+    const adminPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD;
+    if (!adminEmail || !adminPassword) {
+      return;
+    }
+
+    const loginRes = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ email: adminEmail, password: adminPassword })
+      .expect(200);
+
+    const adminToken = loginRes.body.accessToken;
+
+    const patchRes = await request(app.getHttpServer())
+      .patch(`/admin/persona/persona-questions/${personaQuestionId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ label: 'Business Name (Updated)' })
+      .expect(200);
+
+    expect(patchRes.body.label).toBe('Business Name (Updated)');
+  });
+});

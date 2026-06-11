@@ -18,6 +18,7 @@ import { JwtPayload } from '../common/types/jwt-payload.type';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 import { MailService } from '../mail/mail.service';
+import { WorkspacesService } from '../workspaces/workspaces.service';
 import { profileFieldsFromDto } from '../users/profile-fields.util';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
@@ -41,6 +42,7 @@ export class AuthService {
     private configService: ConfigService,
     private prisma: PrismaService,
     private mailService: MailService,
+    private workspacesService: WorkspacesService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -80,6 +82,12 @@ export class AuthService {
           expiresAt,
         },
       });
+
+      await this.workspacesService.createDefaultForUser(
+        created.id,
+        tx,
+        created.displayName ?? created.email.split('@')[0],
+      );
 
       return created;
     });
