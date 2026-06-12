@@ -5,6 +5,7 @@
     {
       "slug": "brand_identity",
       "label": "Brand Identity",
+      "title": "Establish who your brand is.",
       "sortOrder": 1,
       "personaSubComponents": [
         {
@@ -402,24 +403,28 @@
     {
       "slug": "audience_goals",
       "label": "Audience & Goals",
+      "title": "Define who you're speaking to.",
       "sortOrder": 2,
       "personaSubComponents": []
     },
     {
       "slug": "content_strategy",
       "label": "Content Strategy",
+      "title": "Set what you'll talk about.",
       "sortOrder": 3,
       "personaSubComponents": []
     },
     {
       "slug": "channels_cadence",
       "label": "Channels & Cadence",
+      "title": "Choose where and when to post.",
       "sortOrder": 4,
       "personaSubComponents": []
     },
     {
       "slug": "design_voice",
       "label": "Design & Voice",
+      "title": "Shape your look and tone.",
       "sortOrder": 5,
       "personaSubComponents": []
     }
