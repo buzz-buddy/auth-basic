@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PersonaQuestion, Prisma } from '@prisma/client';
+import { PersonaFieldType, PersonaQuestion, Prisma } from '@prisma/client';
 import { badRequestWithFieldErrors } from '../common/exceptions/field-http.exception';
 import { flattenFieldConfig, isArrayFieldType } from './persona-field.util';
 
@@ -10,28 +10,26 @@ type FieldValidator = (
 
 @Injectable()
 export class PersonaResponseValidator {
-  private readonly validators: Record<string, FieldValidator> = {
-    text: (q, v) => this.validateText(q, v),
-    textarea: (q, v) => this.validateText(q, v),
-    single_dropdown: (q, v) => this.validateSingleOption(q, v),
-    single_broad_selector: (q, v) => this.validateBroadSelector(q, v),
-    single_dropdown_with_icon: (q, v) => this.validateIconDropdown(q, v),
-    multi_radio: (q, v) => this.validateMultiRadio(q, v),
+  private readonly validators: { [K in PersonaFieldType]: FieldValidator } = {
+    [PersonaFieldType.text]: (q, v) => this.validateText(q, v),
+    [PersonaFieldType.textarea]: (q, v) => this.validateText(q, v),
+    [PersonaFieldType.single_dropdown]: (q, v) =>
+      this.validateSingleOption(q, v),
+    [PersonaFieldType.single_broad_selector]: (q, v) =>
+      this.validateBroadSelector(q, v),
+    [PersonaFieldType.single_dropdown_with_icon]: (q, v) =>
+      this.validateIconDropdown(q, v),
+    [PersonaFieldType.multi_radio]: (q, v) => this.validateMultiRadio(q, v),
+    [PersonaFieldType.multi_radio_with_brief]: (q, v) =>
+      this.validateMultiRadioWithBrief(q, v),
+    [PersonaFieldType.multi_slider]: (q, v) => this.validateMultiSlider(q, v),
+    [PersonaFieldType.radio]: (q, v) => this.validateSingleOption(q, v),
+    [PersonaFieldType.file_upload_multiple]: (q, v) =>
+      this.validateFileUploadMultiple(q, v),
   };
 
   validate(question: PersonaQuestion, userResponse: unknown): void {
     const validator = this.validators[question.fieldType];
-    if (!validator) {
-      throw badRequestWithFieldErrors(
-        {
-          [String(question.id)]: [
-            `Unsupported fieldType: ${question.fieldType}`,
-          ],
-        },
-        'Validation failed',
-      );
-    }
-
     const error = validator(question, userResponse);
     if (error) {
       throw badRequestWithFieldErrors(
@@ -107,6 +105,78 @@ export class PersonaResponseValidator {
     return null;
   }
 
+  private validateMultiRadioWithBrief(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    const config = flattenFieldConfig(question.fieldConfig);
+    const max = typeof config.max === 'number' ? config.max : undefined;
+    const selections = this.normalizeStringSelections(userResponse, max);
+    if (typeof selections === 'string') {
+      return selections;
+    }
+
+    const allowed = this.broadSelectorValues(question.fieldConfig);
+    return this.validateStringSelectionCount(selections, allowed, config);
+  }
+
+  private validateMultiSlider(question: PersonaQuestion, userResponse: unknown) {
+    if (!Array.isArray(userResponse)) {
+      return 'Must be an array';
+    }
+
+    const config = flattenFieldConfig(question.fieldConfig);
+    const options = config.options;
+    if (!Array.isArray(options)) {
+      return 'Question has no options configured';
+    }
+
+    if (userResponse.length !== options.length) {
+      return `Must have exactly ${options.length} value(s)`;
+    }
+
+    if (!userResponse.every((item) => typeof item === 'number' && Number.isFinite(item))) {
+      return 'All values must be numbers';
+    }
+
+    const minVal = typeof config.min === 'number' ? config.min : 0;
+    const maxVal = typeof config.max === 'number' ? config.max : 100;
+
+    for (const value of userResponse as number[]) {
+      if (value < minVal || value > maxVal) {
+        return `All values must be between ${minVal} and ${maxVal}`;
+      }
+    }
+
+    return null;
+  }
+
+  private validateFileUploadMultiple(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    if (!Array.isArray(userResponse)) {
+      return 'Must be an array';
+    }
+
+    const config = flattenFieldConfig(question.fieldConfig);
+    const max = typeof config.max === 'number' ? config.max : undefined;
+
+    if (max !== undefined && userResponse.length > max) {
+      return `Upload at most ${max} file(s)`;
+    }
+
+    if (
+      !userResponse.every(
+        (item) => typeof item === 'string' && item.length > 0,
+      )
+    ) {
+      return 'Each file must be a non-empty string';
+    }
+
+    return null;
+  }
+
   private validateMultiRadio(question: PersonaQuestion, userResponse: unknown) {
     if (!Array.isArray(userResponse)) {
       return 'Must be an array';
@@ -121,13 +191,47 @@ export class PersonaResponseValidator {
       return 'Question has no options configured';
     }
 
-    const unique = new Set(userResponse as string[]);
-    if (unique.size !== userResponse.length) {
+    return this.validateStringSelectionCount(
+      userResponse as string[],
+      options as string[],
+      config,
+    );
+  }
+
+  private normalizeStringSelections(
+    userResponse: unknown,
+    max: number | undefined,
+  ): string[] | string {
+    if (typeof userResponse === 'string') {
+      if (max !== undefined && max !== 1) {
+        return 'Must be an array when multiple selections are allowed';
+      }
+      return userResponse.length === 0 ? [] : [userResponse];
+    }
+
+    if (!Array.isArray(userResponse)) {
+      return max === 1 ? 'Must be a string' : 'Must be an array';
+    }
+
+    if (!userResponse.every((item) => typeof item === 'string')) {
+      return 'All selections must be strings';
+    }
+
+    return userResponse as string[];
+  }
+
+  private validateStringSelectionCount(
+    selections: string[],
+    allowed: string[],
+    config: Record<string, unknown>,
+  ) {
+    const unique = new Set(selections);
+    if (unique.size !== selections.length) {
       return 'Selections must be unique';
     }
 
-    for (const item of userResponse as string[]) {
-      if (!options.includes(item)) {
+    for (const item of selections) {
+      if (!allowed.includes(item)) {
         return 'All selections must be allowed options';
       }
     }
@@ -135,10 +239,10 @@ export class PersonaResponseValidator {
     const min = typeof config.min === 'number' ? config.min : 0;
     const max = typeof config.max === 'number' ? config.max : undefined;
 
-    if (userResponse.length < min) {
+    if (selections.length < min) {
       return `Select at least ${min} option(s)`;
     }
-    if (max !== undefined && userResponse.length > max) {
+    if (max !== undefined && selections.length > max) {
       return `Select at most ${max} option(s)`;
     }
 

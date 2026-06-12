@@ -1,42 +1,8 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { Prisma, PrismaClient } from '@prisma/client';
-
-type SeedQuestion = {
-  name: string;
-  fieldType: string;
-  label: string;
-  isRequired: boolean;
-  fieldConfig?: Prisma.InputJsonValue;
-};
-
-type SeedSubComponent = {
-  slug: string;
-  label: string;
-  title?: string;
-  description?: string;
-  sideInfo?: string;
-  sortOrder: number;
-  personaQuestions?: SeedQuestion[];
-};
-
-type SeedComponent = {
-  slug: string;
-  label: string;
-  sortOrder: number;
-  personaSubComponents?: SeedSubComponent[];
-};
-
-type PersonaSeedFile = {
-  schemaVersion: number;
-  description: string;
-  personaComponents: SeedComponent[];
-};
+import { personaSchemaV1 } from './seeds/persona/schema-v1';
 
 export async function seedPersonaSchema(prisma: PrismaClient) {
-  const filePath = join(__dirname, 'seeds', 'persona', 'schema-v1.json');
-  const raw = readFileSync(filePath, 'utf-8');
-  const data = JSON.parse(raw) as PersonaSeedFile;
+  const data = personaSchemaV1;
 
   await prisma.personaSchemaVersion.upsert({
     where: { version: data.schemaVersion },

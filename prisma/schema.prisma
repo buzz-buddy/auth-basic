@@ -36,6 +36,19 @@ enum ResponseValueSource {
   AI_EDITED
 }
 
+enum PersonaFieldType {
+  text
+  textarea
+  single_dropdown
+  single_broad_selector
+  single_dropdown_with_icon
+  multi_radio
+  multi_radio_with_brief
+  multi_slider
+  radio
+  file_upload_multiple
+}
+
 model User {
   id                String     @id @default(cuid())
   email             String     @unique
@@ -162,7 +175,7 @@ model PersonaSubComponent {
 model PersonaQuestion {
   id                    Int                         @id @default(autoincrement())
   personaSubComponentId Int
-  fieldType             String
+  fieldType             PersonaFieldType
   name                  String
   label                 String
   isRequired            Boolean                     @default(false)

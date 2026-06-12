@@ -1,0 +1,52 @@
+import { PersonaFieldType } from '../common/enums/persona-field-type.enum';
+
+export type PersonaResponseShape = 'string' | 'array';
+
+export type PersonaFieldTypeMeta = {
+  responseShape: PersonaResponseShape;
+};
+
+/** Per-type defaults used by schema DTOs and response validation. */
+export const PERSONA_FIELD_TYPE_META: {
+  [K in PersonaFieldType]: PersonaFieldTypeMeta;
+} = {
+  [PersonaFieldType.text]: { responseShape: 'string' },
+  [PersonaFieldType.textarea]: { responseShape: 'string' },
+  [PersonaFieldType.single_dropdown]: { responseShape: 'string' },
+  [PersonaFieldType.single_broad_selector]: { responseShape: 'string' },
+  [PersonaFieldType.single_dropdown_with_icon]: { responseShape: 'string' },
+  [PersonaFieldType.multi_radio]: { responseShape: 'array' },
+  [PersonaFieldType.multi_radio_with_brief]: { responseShape: 'string' },
+  [PersonaFieldType.multi_slider]: { responseShape: 'array' },
+  [PersonaFieldType.radio]: { responseShape: 'string' },
+  [PersonaFieldType.file_upload_multiple]: { responseShape: 'array' },
+};
+
+const PERSONA_FIELD_TYPE_VALUES = new Set<string>(
+  Object.values(PersonaFieldType),
+);
+
+export function isPersonaFieldType(value: string): value is PersonaFieldType {
+  return PERSONA_FIELD_TYPE_VALUES.has(value);
+}
+
+export function assertPersonaFieldType(
+  value: string,
+  context?: string,
+): PersonaFieldType {
+  if (!isPersonaFieldType(value)) {
+    const where = context ? ` in ${context}` : '';
+    throw new Error(`Unknown persona fieldType "${value}"${where}`);
+  }
+  return value;
+}
+
+export function isArrayFieldType(fieldType: PersonaFieldType): boolean {
+  return PERSONA_FIELD_TYPE_META[fieldType].responseShape === 'array';
+}
+
+export function defaultResponseValue(
+  fieldType: PersonaFieldType,
+): string | unknown[] {
+  return isArrayFieldType(fieldType) ? [] : '';
+}

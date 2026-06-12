@@ -1,14 +1,13 @@
 import { Prisma } from '@prisma/client';
 
-const ARRAY_FIELD_TYPES = new Set(['multi_radio']);
-
-export function isArrayFieldType(fieldType: string): boolean {
-  return ARRAY_FIELD_TYPES.has(fieldType);
-}
-
-export function defaultResponseValue(fieldType: string): string | unknown[] {
-  return isArrayFieldType(fieldType) ? [] : '';
-}
+export {
+  assertPersonaFieldType,
+  defaultResponseValue,
+  isArrayFieldType,
+  isPersonaFieldType,
+  PERSONA_FIELD_TYPE_META,
+} from './persona-field-type.util';
+export type { PersonaFieldTypeMeta, PersonaResponseShape } from './persona-field-type.util';
 
 export function flattenFieldConfig(
   fieldConfig: Prisma.JsonValue | null,
