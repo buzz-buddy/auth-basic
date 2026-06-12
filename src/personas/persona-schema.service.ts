@@ -2,16 +2,22 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   Persona,
   PersonaComponent,
+  PersonaFieldType,
   PersonaQuestion,
   PersonaSubComponent,
   PersonaStatus,
   WorkspaceQuestionResponse,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { StorageService } from '../storage/storage.service';
 import {
   defaultResponseValue,
   flattenFieldConfig,
 } from './persona-field.util';
+import {
+  extractFileKeysFromResponse,
+  isFileUploadFieldType,
+} from './persona-file.util';
 import { PersonaResponseValidator } from './persona-response-validator';
 
 @Injectable()
@@ -19,6 +25,7 @@ export class PersonaSchemaService {
   constructor(
     private prisma: PrismaService,
     private validator: PersonaResponseValidator,
+    private storageService: StorageService,
   ) {}
 
   async getFullSchema(workspaceId: string, schemaVersion: number) {
@@ -29,8 +36,10 @@ export class PersonaSchemaService {
     return {
       schemaVersion: version.version,
       description: version.description,
-      personaComponents: personaComponents.map((component) =>
-        this.toPersonaComponentDto(component, responseMap, true),
+      personaComponents: await Promise.all(
+        personaComponents.map((component) =>
+          this.toPersonaComponentDto(component, responseMap, true),
+        ),
       ),
     };
   }
@@ -98,8 +107,10 @@ export class PersonaSchemaService {
     return {
       schemaVersion: version.version,
       description: version.description,
-      personaComponents: personaComponents.map((component) =>
-        this.toPersonaComponentDto(component, new Map(), false),
+      personaComponents: await Promise.all(
+        personaComponents.map((component) =>
+          this.toPersonaComponentDto(component, new Map(), false),
+        ),
       ),
     };
   }
@@ -238,7 +249,7 @@ export class PersonaSchemaService {
     return new Map(responses.map((r) => [r.personaQuestionId, r]));
   }
 
-  private toPersonaComponentDto(
+  private async toPersonaComponentDto(
     component: PersonaComponent & {
       personaSubComponents: (PersonaSubComponent & {
         personaQuestions: PersonaQuestion[];
@@ -247,25 +258,35 @@ export class PersonaSchemaService {
     responseMap: Map<number, WorkspaceQuestionResponse>,
     includeResponses: boolean,
   ) {
-    return {
-      id: component.id,
-      label: component.label,
-      sortOrder: component.sortOrder,
-      personaSubComponents: component.personaSubComponents
+    const personaSubComponents = await Promise.all(
+      component.personaSubComponents
         .filter((sub) => sub.personaQuestions.length > 0)
         .map((sub) =>
           this.toPersonaSubComponentDto(sub, responseMap, includeResponses),
         ),
+    );
+
+    return {
+      id: component.id,
+      label: component.label,
+      sortOrder: component.sortOrder,
+      personaSubComponents,
     };
   }
 
-  private toPersonaSubComponentDto(
+  private async toPersonaSubComponentDto(
     subComponent: PersonaSubComponent & {
       personaQuestions: PersonaQuestion[];
     },
     responseMap: Map<number, WorkspaceQuestionResponse>,
     includeResponses: boolean,
   ) {
+    const personaQuestions = await Promise.all(
+      subComponent.personaQuestions.map((question) =>
+        this.toPersonaQuestionDto(question, responseMap, includeResponses),
+      ),
+    );
+
     return {
       id: subComponent.id,
       personaComponentId: subComponent.personaComponentId,
@@ -274,13 +295,11 @@ export class PersonaSchemaService {
       description: subComponent.description,
       sideInfo: subComponent.sideInfo,
       sortOrder: subComponent.sortOrder,
-      personaQuestions: subComponent.personaQuestions.map((question) =>
-        this.toPersonaQuestionDto(question, responseMap, includeResponses),
-      ),
+      personaQuestions,
     };
   }
 
-  private toPersonaQuestionDto(
+  private async toPersonaQuestionDto(
     question: PersonaQuestion,
     responseMap: Map<number, WorkspaceQuestionResponse>,
     includeResponses: boolean,
@@ -288,7 +307,7 @@ export class PersonaSchemaService {
     const stored = responseMap.get(question.id);
     const defaultValue = defaultResponseValue(question.fieldType);
 
-    return {
+    const base = {
       id: question.id,
       personaSubComponentId: question.personaSubComponentId,
       fieldType: question.fieldType,
@@ -296,13 +315,54 @@ export class PersonaSchemaService {
       label: question.label,
       isRequired: question.isRequired,
       ...flattenFieldConfig(question.fieldConfig),
-      ...(includeResponses
-        ? {
-            userResponse: stored?.userResponse ?? defaultValue,
-            aiValue: stored?.aiValue ?? defaultValue,
-            valueSource: stored?.valueSource ?? 'EMPTY',
-          }
-        : {}),
     };
+
+    if (!includeResponses) {
+      return base;
+    }
+
+    const userResponse = stored?.userResponse ?? defaultValue;
+    const aiValue = stored?.aiValue ?? defaultValue;
+
+    if (isFileUploadFieldType(question.fieldType)) {
+      const userResponsePreview = await this.buildFilePreview(
+        question.fieldType,
+        userResponse,
+      );
+      const aiValuePreview = await this.buildFilePreview(
+        question.fieldType,
+        aiValue,
+      );
+
+      return {
+        ...base,
+        userResponse,
+        userResponsePreview,
+        aiValue,
+        aiValuePreview,
+        valueSource: stored?.valueSource ?? 'EMPTY',
+      };
+    }
+
+    return {
+      ...base,
+      userResponse,
+      aiValue,
+      valueSource: stored?.valueSource ?? 'EMPTY',
+    };
+  }
+
+  private async buildFilePreview(
+    fieldType: PersonaFieldType,
+    value: unknown,
+  ): Promise<string | string[]> {
+    const keys = extractFileKeysFromResponse(fieldType, value);
+    const previews = await this.storageService.getPresignedReadUrls(keys);
+
+    if (fieldType === PersonaFieldType.file_upload_single) {
+      return previews[0] ?? '';
+    }
+
+    return previews;
   }
 }

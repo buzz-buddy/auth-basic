@@ -1,15 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PersonaFieldType, PersonaQuestion, Prisma } from '@prisma/client';
 import { badRequestWithFieldErrors } from '../common/exceptions/field-http.exception';
+import { StorageService } from '../storage/storage.service';
+import { isPersonaFileKeyForQuestion } from './persona-file.util';
 import { flattenFieldConfig, isArrayFieldType } from './persona-field.util';
+
+type ValidationContext = {
+  workspaceId: string;
+};
 
 type FieldValidator = (
   question: PersonaQuestion,
   userResponse: unknown,
-) => string | null;
+  context: ValidationContext,
+) => Promise<string | null> | string | null;
 
 @Injectable()
 export class PersonaResponseValidator {
+  constructor(private storageService: StorageService) {}
+
   private readonly validators: { [K in PersonaFieldType]: FieldValidator } = {
     [PersonaFieldType.text]: (q, v) => this.validateText(q, v),
     [PersonaFieldType.textarea]: (q, v) => this.validateText(q, v),
@@ -24,13 +33,19 @@ export class PersonaResponseValidator {
       this.validateMultiRadioWithBrief(q, v),
     [PersonaFieldType.multi_slider]: (q, v) => this.validateMultiSlider(q, v),
     [PersonaFieldType.radio]: (q, v) => this.validateSingleOption(q, v),
-    [PersonaFieldType.file_upload_multiple]: (q, v) =>
-      this.validateFileUploadMultiple(q, v),
+    [PersonaFieldType.file_upload_single]: (q, v, ctx) =>
+      this.validateFileUploadSingle(q, v, ctx),
+    [PersonaFieldType.file_upload_multiple]: (q, v, ctx) =>
+      this.validateFileUploadMultiple(q, v, ctx),
   };
 
-  validate(question: PersonaQuestion, userResponse: unknown): void {
+  async validate(
+    question: PersonaQuestion,
+    userResponse: unknown,
+    context: ValidationContext,
+  ): Promise<void> {
     const validator = this.validators[question.fieldType];
-    const error = validator(question, userResponse);
+    const error = await validator(question, userResponse, context);
     if (error) {
       throw badRequestWithFieldErrors(
         { [String(question.id)]: [error] },
@@ -135,7 +150,11 @@ export class PersonaResponseValidator {
       return `Must have exactly ${options.length} value(s)`;
     }
 
-    if (!userResponse.every((item) => typeof item === 'number' && Number.isFinite(item))) {
+    if (
+      !userResponse.every(
+        (item) => typeof item === 'number' && Number.isFinite(item),
+      )
+    ) {
       return 'All values must be numbers';
     }
 
@@ -151,9 +170,26 @@ export class PersonaResponseValidator {
     return null;
   }
 
-  private validateFileUploadMultiple(
+  private async validateFileUploadSingle(
     question: PersonaQuestion,
     userResponse: unknown,
+    context: ValidationContext,
+  ) {
+    if (userResponse === '' || userResponse === null || userResponse === undefined) {
+      return question.isRequired ? 'A file is required' : null;
+    }
+
+    if (typeof userResponse !== 'string') {
+      return 'Must be a string';
+    }
+
+    return this.validateFileKeys(question, [userResponse], context, 1);
+  }
+
+  private async validateFileUploadMultiple(
+    question: PersonaQuestion,
+    userResponse: unknown,
+    context: ValidationContext,
   ) {
     if (!Array.isArray(userResponse)) {
       return 'Must be an array';
@@ -166,12 +202,54 @@ export class PersonaResponseValidator {
       return `Upload at most ${max} file(s)`;
     }
 
-    if (
-      !userResponse.every(
-        (item) => typeof item === 'string' && item.length > 0,
-      )
-    ) {
+    const keys = userResponse.filter(
+      (item): item is string => typeof item === 'string' && item.length > 0,
+    );
+
+    if (keys.length !== userResponse.length) {
       return 'Each file must be a non-empty string';
+    }
+
+    if (keys.length === 0 && question.isRequired) {
+      return 'At least one file is required';
+    }
+
+    return this.validateFileKeys(question, keys, context, max);
+  }
+
+  private async validateFileKeys(
+    question: PersonaQuestion,
+    keys: string[],
+    context: ValidationContext,
+    maxFiles: number | undefined,
+  ) {
+    const unique = new Set(keys);
+    if (unique.size !== keys.length) {
+      return 'File keys must be unique';
+    }
+
+    if (maxFiles !== undefined && keys.length > maxFiles) {
+      return `Upload at most ${maxFiles} file(s)`;
+    }
+
+    const prefix = this.storageService.getPersonaPrefix();
+
+    for (const key of keys) {
+      if (
+        !isPersonaFileKeyForQuestion(
+          prefix,
+          key,
+          context.workspaceId,
+          question.id,
+        )
+      ) {
+        return 'File key does not belong to this question';
+      }
+
+      const exists = await this.storageService.objectExists(key);
+      if (!exists) {
+        return `File not found: ${key}`;
+      }
     }
 
     return null;

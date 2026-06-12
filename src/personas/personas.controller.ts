@@ -1,15 +1,24 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   Put,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -20,6 +29,8 @@ import type { AuthenticatedUser } from '../common/types/jwt-payload.type';
 import { WorkspacesService } from '../workspaces/workspaces.service';
 import { UpdatePersonaLocationDto } from './dto/update-persona-location.dto';
 import { UpsertPersonaResponsesDto } from './dto/upsert-persona-responses.dto';
+import { DeletePersonaFileDto } from './dto/delete-persona-file.dto';
+import { PersonaFileService } from './persona-file.service';
 import { PersonaResponseService } from './persona-response.service';
 import { PersonaSchemaService } from './persona-schema.service';
 
@@ -31,6 +42,7 @@ export class PersonasController {
     private workspacesService: WorkspacesService,
     private schemaService: PersonaSchemaService,
     private responseService: PersonaResponseService,
+    private fileService: PersonaFileService,
   ) {}
 
   private async getContext(userId: string) {
@@ -99,6 +111,47 @@ export class PersonasController {
   ) {
     return this.getContext(user.sub).then(({ workspaceId, persona }) =>
       this.responseService.upsertResponses(workspaceId, persona.id, dto),
+    );
+  }
+
+  @Post('questions/:personaQuestionId/files')
+  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload a persona question file to S3' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'File uploaded' })
+  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
+  uploadFile(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('personaQuestionId', ParseIntPipe) personaQuestionId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.getContext(user.sub).then(({ workspaceId }) =>
+      this.fileService.uploadFile(workspaceId, personaQuestionId, file),
+    );
+  }
+
+  @Delete('questions/:personaQuestionId/files')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Delete an unsaved persona file upload from S3',
+  })
+  deleteFile(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('personaQuestionId', ParseIntPipe) personaQuestionId: number,
+    @Body() dto: DeletePersonaFileDto,
+  ) {
+    return this.getContext(user.sub).then(({ workspaceId }) =>
+      this.fileService.deleteFile(workspaceId, personaQuestionId, dto.key),
     );
   }
 

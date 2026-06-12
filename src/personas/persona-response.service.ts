@@ -1,8 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ResponseValueSource } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { StorageService } from '../storage/storage.service';
 import { UpsertPersonaResponsesDto } from './dto/upsert-persona-responses.dto';
 import { UpdatePersonaLocationDto } from './dto/update-persona-location.dto';
+import {
+  extractFileKeysFromResponse,
+  isFileUploadFieldType,
+} from './persona-file.util';
 import { PersonaResponseValidator } from './persona-response-validator';
 import { PersonaSchemaService } from './persona-schema.service';
 
@@ -12,6 +17,7 @@ export class PersonaResponseService {
     private prisma: PrismaService,
     private validator: PersonaResponseValidator,
     private schemaService: PersonaSchemaService,
+    private storageService: StorageService,
   ) {}
 
   async upsertResponses(
@@ -33,10 +39,25 @@ export class PersonaResponseService {
     }
 
     const questionMap = new Map(questions.map((q) => [q.id, q]));
+    const existingResponses =
+      await this.prisma.workspaceQuestionResponse.findMany({
+        where: {
+          workspaceId,
+          personaQuestionId: { in: questionIds },
+        },
+      });
+    const existingByQuestionId = new Map(
+      existingResponses.map((response) => [
+        response.personaQuestionId,
+        response,
+      ]),
+    );
 
     for (const item of dto.responses) {
       const question = questionMap.get(item.personaQuestionId)!;
-      this.validator.validate(question, item.userResponse);
+      await this.validator.validate(question, item.userResponse, {
+        workspaceId,
+      });
     }
 
     await this.prisma.$transaction(async (tx) => {
@@ -74,6 +95,28 @@ export class PersonaResponseService {
         });
       }
     });
+
+    for (const item of dto.responses) {
+      const question = questionMap.get(item.personaQuestionId)!;
+      if (!isFileUploadFieldType(question.fieldType)) {
+        continue;
+      }
+
+      const existing = existingByQuestionId.get(item.personaQuestionId);
+      const oldKeys = extractFileKeysFromResponse(
+        question.fieldType,
+        existing?.userResponse,
+      );
+      const newKeys = extractFileKeysFromResponse(
+        question.fieldType,
+        item.userResponse,
+      );
+      const removedKeys = oldKeys.filter((key) => !newKeys.includes(key));
+
+      for (const key of removedKeys) {
+        await this.storageService.deleteObject(key);
+      }
+    }
 
     const status = await this.schemaService.recomputePersonaStatus(
       workspaceId,

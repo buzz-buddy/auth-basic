@@ -46,6 +46,7 @@ enum PersonaFieldType {
   multi_radio_with_brief
   multi_slider
   radio
+  file_upload_single
   file_upload_multiple
 }
 

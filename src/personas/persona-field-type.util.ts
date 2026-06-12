@@ -19,6 +19,7 @@ export const PERSONA_FIELD_TYPE_META: {
   [PersonaFieldType.multi_radio_with_brief]: { responseShape: 'string' },
   [PersonaFieldType.multi_slider]: { responseShape: 'array' },
   [PersonaFieldType.radio]: { responseShape: 'string' },
+  [PersonaFieldType.file_upload_single]: { responseShape: 'string' },
   [PersonaFieldType.file_upload_multiple]: { responseShape: 'array' },
 };
 

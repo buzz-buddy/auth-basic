@@ -1,6 +1,7 @@
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadObjectCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
@@ -8,6 +9,11 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
+
+import {
+  buildPersonaFileKey,
+  extensionForMime,
+} from '../personas/persona-file.util';
 
 const EXTENSION_BY_MIME: Record<string, string> = {
   'image/jpeg': 'jpg',
@@ -20,6 +26,7 @@ export class StorageService {
   private readonly s3Client: S3Client;
   private readonly bucket: string;
   private readonly avatarPrefix: string;
+  private readonly personaPrefix: string;
   private readonly presignedExpiresIn: number;
 
   constructor(private configService: ConfigService) {
@@ -27,6 +34,9 @@ export class StorageService {
     this.bucket = this.configService.getOrThrow<string>('AWS_S3_BUCKET');
     this.avatarPrefix = this.configService
       .get<string>('AWS_S3_AVATAR_PREFIX', 'avatars')
+      .replace(/^\/+|\/+$/g, '');
+    this.personaPrefix = this.configService
+      .get<string>('AWS_S3_PERSONA_PREFIX', 'personas')
       .replace(/^\/+|\/+$/g, '');
     this.presignedExpiresIn = Number(
       this.configService.get('AWS_S3_PRESIGNED_URL_EXPIRES_IN', '3600'),
@@ -64,6 +74,82 @@ export class StorageService {
     );
 
     return key;
+  }
+
+  getPersonaPrefix(): string {
+    return this.personaPrefix;
+  }
+
+  async uploadPersonaFile(
+    workspaceId: string,
+    personaQuestionId: number,
+    file: Express.Multer.File,
+  ): Promise<string> {
+    const extension = extensionForMime(file.mimetype);
+    if (!extension) {
+      throw new Error(`Unsupported mime type: ${file.mimetype}`);
+    }
+
+    const key = buildPersonaFileKey(
+      this.personaPrefix,
+      workspaceId,
+      personaQuestionId,
+      extension,
+    );
+
+    await this.s3Client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      }),
+    );
+
+    return key;
+  }
+
+  async objectExists(key: string): Promise<boolean> {
+    try {
+      await this.s3Client.send(
+        new HeadObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+        }),
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async deleteObject(key: string | null | undefined) {
+    if (!key) {
+      return;
+    }
+
+    await this.s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      }),
+    );
+  }
+
+  async getPresignedReadUrls(keys: string[]): Promise<string[]> {
+    return Promise.all(keys.map((key) => this.getPresignedReadUrl(key)));
+  }
+
+  resolvePersonaFileKey(stored: string | null | undefined): string | null {
+    if (!stored) {
+      return null;
+    }
+
+    if (stored.startsWith(`${this.personaPrefix}/`)) {
+      return stored;
+    }
+
+    return null;
   }
 
   async getPresignedReadUrl(key: string): Promise<string> {
