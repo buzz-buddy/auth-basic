@@ -11,7 +11,7 @@ export const personaSchemaV1 = {
       title: "Establish who your brand is.",
       sortOrder: 1,
       personaSubComponents: [
-        {
+        { 
           slug: "basics",
           label: "Basics",
           title: "Here's what BUZZZED found",
@@ -528,28 +528,401 @@ export const personaSchemaV1 = {
       label: "Audience & Goals",
       title: "Define who you're speaking to.",
       sortOrder: 2,
-      personaSubComponents: [],
+      personaSubComponents: [
+        {
+          slug: "audience_persona",
+          label: "Audience Persona",
+          title: "Audience Persona",
+          description: "Build a precise profile of who you're creating content for.",
+          sideInfo: "",
+          sortOrder: 1,
+          personaQuestions: [
+            {
+              name: "persona_name",
+              fieldType: PersonaFieldType.text,
+              label: "Persona Name",
+              isRequired: true,
+              fieldConfig: {
+                max: 250,
+              },
+            },
+            {
+              name: "age_range",
+              fieldType: PersonaFieldType.range_slider,
+              label: "Age Range",
+              isRequired: false,
+              fieldConfig: {
+                min: 18,
+                max: 65,
+              },
+            },
+            {
+              name: "gender",
+              fieldType: PersonaFieldType.multi_radio,
+              label: "Gender",
+              isRequired: true,
+              fieldConfig: {
+                max: null,
+                min: null,
+                options: [
+                  "All",
+                  "Male",
+                  "Female",
+                  "Non-Binary",
+                  "Custom",
+                ],
+              },
+            },
+            {
+              name: "seniority_level",
+              fieldType: PersonaFieldType.single_dropdown,
+              label: "Seniority (B2B)",
+              isRequired: false,
+              fieldConfig: {
+                options: [
+                  "C-level",
+                  "VP / Director",
+                  "Manager",
+                  "IC",
+                  "Owner / Founder"
+                ],
+              },
+            },
+            {
+              name: "company_size",
+              fieldType: PersonaFieldType.single_dropdown,
+              label: "Company Size (B2B)",
+              isRequired: false,
+              fieldConfig: {
+                options: [
+                  "Solopreneur",
+                  "2-10",
+                  "11-50",
+                  "51-200",
+                  "201-1K+"
+                ],
+              },
+            },
+            {
+              name: "top_pain_points",
+              fieldType: PersonaFieldType.single_broad_selector,
+              label: "Top Pain Points",
+              isRequired: false,
+              fieldConfig: {
+                max: 3,
+                min: null,
+                options: [
+                  [
+                    "Inconsistent content",
+                    "Content varies in quality, tone, or format across channels",
+                  ],
+                  [
+                    "Low engagement",
+                    "Posts and content fail to attract likes, shares, or comments",
+                  ],
+                  [
+                    "No time to create",
+                    "Not enough hours to produce content consistently",
+                  ],
+                  [
+                    "No clear strategy",
+                    "Content lacks direction, goals, or a cohesive plan",
+                  ],
+                  [
+                    "Hard to scale",
+                    "Can't produce more content without proportionally more effort",
+                  ],
+                  [
+                    "Poor ROI",
+                    "Content investment doesn't translate into measurable returns",
+                  ],
+                  [
+                    "Too many tools",
+                    "Managing multiple platforms and tools is overwhelming",
+                  ],
+                  [
+                    "Brand inconsistency",
+                    "Messaging and visuals don't align across touchpoints",
+                  ],
+                ],
+              },
+            },
+            {
+              name: "top_goals_aspirations",
+              fieldType: PersonaFieldType.multi_radio,
+              label: "Top Goals / Aspirations",
+              isRequired: false,
+              fieldConfig: {
+                max: 3,
+                min: null,
+                options: [
+                  "Build authority",
+                  "Grow followers",
+                  "Improve ROI",
+                  "Save time",
+                  "Generate leads",
+                  "Scale content",
+                  "Build community",
+                  "Launch a brand",
+                  "Increase sales",
+                ],
+              },
+            },
+            {
+              name: "where_they_hang_out_online",
+              fieldType: PersonaFieldType.multi_radio_with_icon,
+              label: "Where they hang out online",
+              isRequired: false,
+              fieldConfig: {
+                max: null,
+                min: null,
+                options: [
+                  ["Facebook", "icon.png"],
+                  ["Instagram", "icon.png"],
+                  ["YouTube", "icon.png"],
+                  ["TikTok", "icon.png"],
+                  ["X", "icon.png"],
+                  ["Snapchat", "icon.png"],
+                  ["LinkedIn", "icon.png"],
+                  ["Pinterest", "icon.png"],
+                  ["Discord", "icon.png"],
+                ],
+              },
+            },
+            {
+              name: "their_role_in_buying",
+              fieldType: PersonaFieldType.single_dropdown,
+              label: "Their role in buying",
+              isRequired: false,
+              fieldConfig: {
+                options: [
+                  "Decision maker",
+                  "Influencer",
+                  "End-user"
+                ],
+              },
+            },
+            {
+              name: "what_they_consume",
+              fieldType: PersonaFieldType.multi_radio,
+              label: "What they consume",
+              isRequired: false,
+              fieldConfig: {
+                max: null,
+                min: null,
+                options: [
+                  "Top creators",
+                  "Industry publications",
+                  "YouTube channels",
+                  "Podcasts",
+                  "Newsletters",
+                  "Trade journals",
+                ],
+              },
+            },
+          ],     
+        },
+        {
+          slug: "representation",
+          label: "Representation",
+          title: "Who Appears in Content?",
+          description: "These choices shape every visual BUZZZED generates for you.",
+          sideInfo: "",
+          sortOrder: 2,
+          personaQuestions: [
+            {
+              name: "people_shown_in_content",
+              fieldType: PersonaFieldType.multi_radio,
+              label: "People shown in content",
+              isRequired: false,
+              fieldConfig: {
+                max: null,
+                min: null,
+                options: [
+                  "Same demographics as audience",
+                  "Founder only",
+                  "Real customers",
+                  "Diverse / multicultural",
+                  "Team members",
+                  "No people",
+                ],
+              },
+            },
+          ],
+        },
+        {
+          slug: "goals",
+          label: "Goals",
+          title: "Goals",
+          description: "Set your primary business objective and time horizon.",
+          sideInfo: "",
+          sortOrder: 3,
+          personaQuestions: [
+            {
+              name: "primary_business_objective",
+              fieldType: PersonaFieldType.multi_radio,
+              label: "Primary Business Objective",
+              isRequired: true,
+              fieldConfig: {
+                max: null,
+                min: null,
+                options: [
+                  "Build awareness",
+                  "Generate leads",
+                  "Establish thought leadership",
+                  "Build community",
+                  "Recruit talent",
+                  "Retain customers",
+                  "Drive sales",
+                  "Drive traffic",
+                ],
+              },
+            },
+            {
+              name: "time_horizon",
+              fieldType: PersonaFieldType.single_dropdown,
+              label: "Time Horizon",
+              isRequired: false,
+              fieldConfig: {
+                options: [
+                  "1 month",
+                  "3 months",
+                  "6 months",
+                  "12 months",
+                  "Ongoing",
+                ],
+              },
+            },
+            {
+              name: "monthly_content_budget",
+              fieldType: PersonaFieldType.single_slider,
+              label: "Monthly Content Budget",
+              isRequired: false,
+              fieldConfig: {
+                min: 100,
+                max: 10000,
+                minLabel: "$100",
+                maxLabel: "$10K",
+              },
+            },
+          ],
+        },
+        {
+          slug: "competitive_context",
+          label: "Competitive Context",
+          title: "Competitive Context",
+          description: "Optional — AI analyzes competitor public content to sharpen your differentiation.",
+          sideInfo: "",
+          sortOrder: 4,
+          personaQuestions: [
+            {
+              name: "top_competitors",
+              fieldType: PersonaFieldType.multi_text,
+              label: "Top Competitors",
+              isRequired: false,
+              fieldConfig: {
+                max: 3,
+                min: null,
+                placeholders: [
+                  "https://competitor1.com",
+                  "https://competitor2.com",
+                  "https://competitor3.com",
+                ],
+              },
+            },
+            {
+              name: "differentiation_in_one_line",
+              fieldType: PersonaFieldType.text,
+              label: "Differentiation in one line",
+              isRequired: false,
+              fieldConfig: {
+                max: 250,
+                placeholder: "We're the only platform that...",
+                helperText: "What makes you different from all of them?",
+              },
+            },
+          ],
+        },
+        {
+          slug: "funnel_mix",
+          label: "Funnel Mix",
+          title: "Funnel Stage Content Mix",
+          description: "How much of your content should target each stage of the funnel? Sliders are linked — they always sum to 100%.",
+          sideInfo: "",
+          sortOrder: 5,
+          personaQuestions: [
+            {
+              name: "funnel_mix",
+              fieldType: PersonaFieldType.multi_slider,
+              label: "Funnel Mix",
+              isRequired: true,
+              fieldConfig: {
+                min: 0,
+                max: 100,
+                sumTo: 100,
+                options: [
+                  "TOFU (Awareness)",
+                  "MOFU (Consideration)",
+                  "BOFU (Decision)",
+                ],
+                helperText:
+                  "A 50/30/20 split is the most common high-performing mix. Adjust based on your current stage.",
+              },
+            },
+          ],
+        }
+      ],
     },
     {
       slug: "content_strategy",
       label: "Content Strategy",
       title: "Set what you'll talk about.",
       sortOrder: 3,
-      personaSubComponents: [],
+      personaSubComponents: [
+        {
+          slug: "basics",
+          label: "Basics",
+          title: "Here's what BUZZZED found",
+          description: "We analyzed your website and pre-filled your project details. Review and edit anything before continuing.",
+          sideInfo: "",
+          sortOrder: 1,
+          personaQuestions: [],
+        },
+      ],
     },
     {
       slug: "channels_cadence",
       label: "Channels & Cadence",
       title: "Choose where and when to post.",
       sortOrder: 4,
-      personaSubComponents: [],
+      personaSubComponents: [
+        {
+          slug: "basics",
+          label: "Basics",
+          title: "Here's what BUZZZED found",
+          description: "We analyzed your website and pre-filled your project details. Review and edit anything before continuing.",
+          sideInfo: "",
+          sortOrder: 1,
+          personaQuestions: [],
+        },
+      ],
     },
     {
       slug: "design_voice",
       label: "Design & Voice",
       title: "Shape your look and tone.",
       sortOrder: 5,
-      personaSubComponents: [],
+      personaSubComponents: [
+        {
+          slug: "basics",
+          label: "Basics",
+          title: "Here's what BUZZZED found",
+          description: "We analyzed your website and pre-filled your project details. Review and edit anything before continuing.",
+          sideInfo: "",
+          sortOrder: 1,
+          personaQuestions: [],
+        },
+      ],
     },
   ],
 } satisfies PersonaSchemaSeed;

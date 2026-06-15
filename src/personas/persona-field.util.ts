@@ -4,6 +4,7 @@ export {
   assertPersonaFieldType,
   defaultResponseValue,
   isArrayFieldType,
+  isNumericFieldType,
   isPersonaFieldType,
   PERSONA_FIELD_TYPE_META,
 } from './persona-field-type.util';

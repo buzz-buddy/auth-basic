@@ -1,6 +1,6 @@
 import { PersonaFieldType } from '../common/enums/persona-field-type.enum';
 
-export type PersonaResponseShape = 'string' | 'array';
+export type PersonaResponseShape = 'string' | 'array' | 'number';
 
 export type PersonaFieldTypeMeta = {
   responseShape: PersonaResponseShape;
@@ -11,16 +11,20 @@ export const PERSONA_FIELD_TYPE_META: {
   [K in PersonaFieldType]: PersonaFieldTypeMeta;
 } = {
   [PersonaFieldType.text]: { responseShape: 'string' },
+  [PersonaFieldType.multi_text]: { responseShape: 'array' },
   [PersonaFieldType.textarea]: { responseShape: 'string' },
   [PersonaFieldType.single_dropdown]: { responseShape: 'string' },
   [PersonaFieldType.single_broad_selector]: { responseShape: 'string' },
   [PersonaFieldType.single_dropdown_with_icon]: { responseShape: 'string' },
   [PersonaFieldType.multi_radio]: { responseShape: 'array' },
+  [PersonaFieldType.multi_radio_with_icon]: { responseShape: 'array' },
   [PersonaFieldType.multi_radio_with_brief]: { responseShape: 'string' },
   [PersonaFieldType.multi_slider]: { responseShape: 'array' },
+  [PersonaFieldType.single_slider]: { responseShape: 'number' },
   [PersonaFieldType.radio]: { responseShape: 'string' },
   [PersonaFieldType.file_upload_single]: { responseShape: 'string' },
   [PersonaFieldType.file_upload_multiple]: { responseShape: 'array' },
+  [PersonaFieldType.range_slider]: { responseShape: 'array' },
 };
 
 const PERSONA_FIELD_TYPE_VALUES = new Set<string>(
@@ -46,8 +50,18 @@ export function isArrayFieldType(fieldType: PersonaFieldType): boolean {
   return PERSONA_FIELD_TYPE_META[fieldType].responseShape === 'array';
 }
 
+export function isNumericFieldType(fieldType: PersonaFieldType): boolean {
+  return PERSONA_FIELD_TYPE_META[fieldType].responseShape === 'number';
+}
+
 export function defaultResponseValue(
   fieldType: PersonaFieldType,
-): string | unknown[] {
-  return isArrayFieldType(fieldType) ? [] : '';
+): string | unknown[] | null {
+  if (isArrayFieldType(fieldType)) {
+    return [];
+  }
+  if (isNumericFieldType(fieldType)) {
+    return null;
+  }
+  return '';
 }

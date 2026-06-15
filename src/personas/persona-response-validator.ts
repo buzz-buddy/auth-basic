@@ -3,7 +3,7 @@ import { PersonaFieldType, PersonaQuestion, Prisma } from '@prisma/client';
 import { badRequestWithFieldErrors } from '../common/exceptions/field-http.exception';
 import { StorageService } from '../storage/storage.service';
 import { isPersonaFileKeyForQuestion } from './persona-file.util';
-import { flattenFieldConfig, isArrayFieldType } from './persona-field.util';
+import { flattenFieldConfig, isArrayFieldType, isNumericFieldType } from './persona-field.util';
 
 type ValidationContext = {
   workspaceId: string;
@@ -21,6 +21,7 @@ export class PersonaResponseValidator {
 
   private readonly validators: { [K in PersonaFieldType]: FieldValidator } = {
     [PersonaFieldType.text]: (q, v) => this.validateText(q, v),
+    [PersonaFieldType.multi_text]: (q, v) => this.validateMultiText(q, v),
     [PersonaFieldType.textarea]: (q, v) => this.validateText(q, v),
     [PersonaFieldType.single_dropdown]: (q, v) =>
       this.validateSingleOption(q, v),
@@ -29,14 +30,18 @@ export class PersonaResponseValidator {
     [PersonaFieldType.single_dropdown_with_icon]: (q, v) =>
       this.validateIconDropdown(q, v),
     [PersonaFieldType.multi_radio]: (q, v) => this.validateMultiRadio(q, v),
+    [PersonaFieldType.multi_radio_with_icon]: (q, v) =>
+      this.validateMultiRadioWithIcon(q, v),
     [PersonaFieldType.multi_radio_with_brief]: (q, v) =>
       this.validateMultiRadioWithBrief(q, v),
     [PersonaFieldType.multi_slider]: (q, v) => this.validateMultiSlider(q, v),
+    [PersonaFieldType.single_slider]: (q, v) => this.validateSingleSlider(q, v),
     [PersonaFieldType.radio]: (q, v) => this.validateSingleOption(q, v),
     [PersonaFieldType.file_upload_single]: (q, v, ctx) =>
       this.validateFileUploadSingle(q, v, ctx),
     [PersonaFieldType.file_upload_multiple]: (q, v, ctx) =>
       this.validateFileUploadMultiple(q, v, ctx),
+    [PersonaFieldType.range_slider]: (q, v) => this.validateRangeSlider(q, v),
   };
 
   async validate(
@@ -61,6 +66,17 @@ export class PersonaResponseValidator {
     if (isArrayFieldType(question.fieldType)) {
       return Array.isArray(userResponse) && userResponse.length > 0;
     }
+    if (isNumericFieldType(question.fieldType)) {
+      return typeof userResponse === 'number' && Number.isFinite(userResponse);
+    }
+    if (question.fieldType === PersonaFieldType.multi_text) {
+      return (
+        Array.isArray(userResponse) &&
+        userResponse.some(
+          (item) => typeof item === 'string' && item.trim().length > 0,
+        )
+      );
+    }
     return typeof userResponse === 'string' && userResponse.length > 0;
   }
 
@@ -72,6 +88,31 @@ export class PersonaResponseValidator {
     if (typeof max === 'number' && userResponse.length > max) {
       return `Must be at most ${max} characters`;
     }
+    return null;
+  }
+
+  private validateMultiText(question: PersonaQuestion, userResponse: unknown) {
+    if (!Array.isArray(userResponse)) {
+      return 'Must be an array';
+    }
+    if (!userResponse.every((item) => typeof item === 'string')) {
+      return 'All values must be strings';
+    }
+
+    const config = flattenFieldConfig(question.fieldConfig);
+    const max = typeof config.max === 'number' ? config.max : undefined;
+    const itemMax = typeof config.itemMax === 'number' ? config.itemMax : undefined;
+
+    if (max !== undefined && userResponse.length > max) {
+      return `Enter at most ${max} value(s)`;
+    }
+
+    for (const item of userResponse as string[]) {
+      if (itemMax !== undefined && item.length > itemMax) {
+        return `Each value must be at most ${itemMax} characters`;
+      }
+    }
+
     return null;
   }
 
@@ -165,6 +206,65 @@ export class PersonaResponseValidator {
       if (value < minVal || value > maxVal) {
         return `All values must be between ${minVal} and ${maxVal}`;
       }
+    }
+
+    const sumTo = typeof config.sumTo === 'number' ? config.sumTo : undefined;
+    if (sumTo !== undefined) {
+      const sum = (userResponse as number[]).reduce(
+        (total, value) => total + value,
+        0,
+      );
+      if (sum !== sumTo) {
+        return `Values must sum to ${sumTo}`;
+      }
+    }
+
+    return null;
+  }
+
+  private validateSingleSlider(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    if (typeof userResponse !== 'number' || !Number.isFinite(userResponse)) {
+      return 'Must be a number';
+    }
+
+    const config = flattenFieldConfig(question.fieldConfig);
+    const minVal = typeof config.min === 'number' ? config.min : 0;
+    const maxVal = typeof config.max === 'number' ? config.max : 100;
+
+    if (userResponse < minVal || userResponse > maxVal) {
+      return `Value must be between ${minVal} and ${maxVal}`;
+    }
+
+    return null;
+  }
+
+  private validateRangeSlider(question: PersonaQuestion, userResponse: unknown) {
+    if (!Array.isArray(userResponse)) {
+      return 'Must be an array';
+    }
+
+    if (userResponse.length !== 2) {
+      return 'Must have exactly 2 value(s)';
+    }
+
+    if (
+      !userResponse.every(
+        (item) => typeof item === 'number' && Number.isFinite(item),
+      )
+    ) {
+      return 'All values must be numbers';
+    }
+
+    const config = flattenFieldConfig(question.fieldConfig);
+    const minVal = typeof config.min === 'number' ? config.min : 0;
+    const maxVal = typeof config.max === 'number' ? config.max : 100;
+    const [start, end] = userResponse as number[];
+
+    if (start < minVal || end > maxVal || start > end) {
+      return `Values must be between ${minVal} and ${maxVal}, with start <= end`;
     }
 
     return null;
@@ -272,6 +372,27 @@ export class PersonaResponseValidator {
     return this.validateStringSelectionCount(
       userResponse as string[],
       options as string[],
+      config,
+    );
+  }
+
+  private validateMultiRadioWithIcon(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    if (!Array.isArray(userResponse)) {
+      return 'Must be an array';
+    }
+    if (!userResponse.every((item) => typeof item === 'string')) {
+      return 'All selections must be strings';
+    }
+
+    const config = flattenFieldConfig(question.fieldConfig);
+    const allowed = this.iconDropdownLabels(question.fieldConfig);
+
+    return this.validateStringSelectionCount(
+      userResponse as string[],
+      allowed,
       config,
     );
   }
