@@ -22,6 +22,8 @@ export class PersonaResponseValidator {
   private readonly validators: { [K in PersonaFieldType]: FieldValidator } = {
     [PersonaFieldType.text]: (q, v) => this.validateText(q, v),
     [PersonaFieldType.multi_text]: (q, v) => this.validateMultiText(q, v),
+    [PersonaFieldType.multi_date_entry]: (q, v) =>
+      this.validateMultiDateEntry(q, v),
     [PersonaFieldType.textarea]: (q, v) => this.validateText(q, v),
     [PersonaFieldType.single_dropdown]: (q, v) =>
       this.validateSingleOption(q, v),
@@ -77,6 +79,12 @@ export class PersonaResponseValidator {
         )
       );
     }
+    if (question.fieldType === PersonaFieldType.multi_date_entry) {
+      return (
+        Array.isArray(userResponse) &&
+        userResponse.some((item) => this.isValidDateEntry(item))
+      );
+    }
     return typeof userResponse === 'string' && userResponse.length > 0;
   }
 
@@ -114,6 +122,70 @@ export class PersonaResponseValidator {
     }
 
     return null;
+  }
+
+  private validateMultiDateEntry(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    if (!Array.isArray(userResponse)) {
+      return 'Must be an array';
+    }
+
+    const config = flattenFieldConfig(question.fieldConfig);
+    const max = typeof config.max === 'number' ? config.max : undefined;
+    const nameMax =
+      typeof config.nameMax === 'number' ? config.nameMax : undefined;
+
+    if (max !== undefined && userResponse.length > max) {
+      return `Enter at most ${max} event(s)`;
+    }
+
+    for (const item of userResponse) {
+      if (!this.isValidDateEntry(item)) {
+        return 'Each event must have a non-empty name and a valid date';
+      }
+
+      const entry = item as { name: string; date: string };
+      if (nameMax !== undefined && entry.name.length > nameMax) {
+        return `Each event name must be at most ${nameMax} characters`;
+      }
+
+      if (!this.isValidIsoDate(entry.date)) {
+        return 'Each event date must be a valid ISO date (YYYY-MM-DD)';
+      }
+    }
+
+    return null;
+  }
+
+  private isValidDateEntry(item: unknown): item is { name: string; date: string } {
+    if (item === null || typeof item !== 'object' || Array.isArray(item)) {
+      return false;
+    }
+
+    const entry = item as Record<string, unknown>;
+    return (
+      typeof entry.name === 'string' &&
+      entry.name.trim().length > 0 &&
+      typeof entry.date === 'string' &&
+      entry.date.trim().length > 0
+    );
+  }
+
+  private isValidIsoDate(value: string): boolean {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return false;
+    }
+
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+
+    return (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month - 1 &&
+      date.getUTCDate() === day
+    );
   }
 
   private validateSingleOption(
@@ -183,12 +255,28 @@ export class PersonaResponseValidator {
 
     const config = flattenFieldConfig(question.fieldConfig);
     const options = config.options;
-    if (!Array.isArray(options)) {
-      return 'Question has no options configured';
-    }
+    const dependsOn =
+      typeof config.dependsOn === 'string' ? config.dependsOn : undefined;
 
-    if (userResponse.length !== options.length) {
-      return `Must have exactly ${options.length} value(s)`;
+    if (dependsOn) {
+      const minCount = typeof config.minCount === 'number' ? config.minCount : 1;
+      const maxCount =
+        typeof config.maxCount === 'number' ? config.maxCount : undefined;
+
+      if (userResponse.length < minCount) {
+        return `Must have at least ${minCount} value(s)`;
+      }
+      if (maxCount !== undefined && userResponse.length > maxCount) {
+        return `Must have at most ${maxCount} value(s)`;
+      }
+    } else {
+      if (!Array.isArray(options)) {
+        return 'Question has no options configured';
+      }
+
+      if (userResponse.length !== options.length) {
+        return `Must have exactly ${options.length} value(s)`;
+      }
     }
 
     if (

@@ -39,6 +39,7 @@ enum ResponseValueSource {
 enum PersonaFieldType {
   text
   multi_text
+  multi_date_entry
   textarea
   single_dropdown
   single_broad_selector

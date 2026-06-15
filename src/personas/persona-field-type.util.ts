@@ -12,6 +12,7 @@ export const PERSONA_FIELD_TYPE_META: {
 } = {
   [PersonaFieldType.text]: { responseShape: 'string' },
   [PersonaFieldType.multi_text]: { responseShape: 'array' },
+  [PersonaFieldType.multi_date_entry]: { responseShape: 'array' },
   [PersonaFieldType.textarea]: { responseShape: 'string' },
   [PersonaFieldType.single_dropdown]: { responseShape: 'string' },
   [PersonaFieldType.single_broad_selector]: { responseShape: 'string' },
