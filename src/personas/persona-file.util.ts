@@ -7,29 +7,29 @@ export function normalizeStoragePrefix(prefix: string): string {
 export function buildPersonaFileKeyPrefix(
   prefix: string,
   workspaceId: string,
-  personaQuestionId: number,
+  questionName: string,
 ): string {
-  return `${normalizeStoragePrefix(prefix)}/${workspaceId}/${personaQuestionId}`;
+  return `${normalizeStoragePrefix(prefix)}/${workspaceId}/${questionName}`;
 }
 
 export function buildPersonaFileKey(
   prefix: string,
   workspaceId: string,
-  personaQuestionId: number,
+  questionName: string,
   extension: string,
 ): string {
   const timestamp = Date.now();
   const random = Math.random().toString(16).slice(2, 10);
-  return `${buildPersonaFileKeyPrefix(prefix, workspaceId, personaQuestionId)}/${timestamp}-${random}.${extension}`;
+  return `${buildPersonaFileKeyPrefix(prefix, workspaceId, questionName)}/${timestamp}-${random}.${extension}`;
 }
 
 export function isPersonaFileKeyForQuestion(
   prefix: string,
   key: string,
   workspaceId: string,
-  personaQuestionId: number,
+  questionName: string,
 ): boolean {
-  const expectedPrefix = `${buildPersonaFileKeyPrefix(prefix, workspaceId, personaQuestionId)}/`;
+  const expectedPrefix = `${buildPersonaFileKeyPrefix(prefix, workspaceId, questionName)}/`;
   return key.startsWith(expectedPrefix) && key.length > expectedPrefix.length;
 }
 

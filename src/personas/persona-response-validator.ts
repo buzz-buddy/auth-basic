@@ -55,7 +55,7 @@ export class PersonaResponseValidator {
     const error = await validator(question, userResponse, context);
     if (error) {
       throw badRequestWithFieldErrors(
-        { [String(question.id)]: [error] },
+        { [question.name]: [error] },
         'Validation failed',
       );
     }
@@ -428,7 +428,7 @@ export class PersonaResponseValidator {
           prefix,
           key,
           context.workspaceId,
-          question.id,
+          question.name,
         )
       ) {
         return 'File key does not belong to this question';

@@ -12,8 +12,11 @@ describe('Persona (e2e)', () => {
   let app: INestApplication<App>;
   let accessToken: string;
   let personaQuestionId: number;
+  let personaQuestionName: string;
   let personaComponentId: number;
   let personaSubComponentId: number;
+  let personaComponentSlug: string;
+  let personaSubComponentSlug: string;
 
   const email = `persona-e2e-${Date.now()}@example.com`;
   const password = 'password123';
@@ -75,6 +78,26 @@ describe('Persona (e2e)', () => {
     personaSubComponentId = res.body.persona.resume.personaSubComponentId;
   });
 
+  it('GET /workspaces/me/persona/schema resolves slugs for nested routes', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/workspaces/me/persona/schema')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    personaComponentSlug = res.body.personaComponents[0].slug;
+    personaSubComponentSlug =
+      res.body.personaComponents[0].personaSubComponents[0].slug;
+
+    const componentRes = await request(app.getHttpServer())
+      .get(
+        `/workspaces/me/persona/schema/persona-components/${personaComponentSlug}`,
+      )
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(componentRes.body.slug).toBe(personaComponentSlug);
+  });
+
   it('GET /workspaces/me/persona/schema returns personaComponents tree', async () => {
     const res = await request(app.getHttpServer())
       .get('/workspaces/me/persona/schema')
@@ -86,12 +109,19 @@ describe('Persona (e2e)', () => {
     expect(res.body.personaComponents.length).toBeGreaterThan(0);
 
     const firstComponent = res.body.personaComponents[0];
+    expect(firstComponent).toMatchObject({
+      slug: expect.any(String),
+    });
     expect(firstComponent.personaSubComponents.length).toBeGreaterThan(0);
 
     const firstSub = firstComponent.personaSubComponents[0];
+    expect(firstSub).toMatchObject({
+      slug: expect.any(String),
+    });
     expect(firstSub.personaQuestions.length).toBeGreaterThan(0);
 
     personaQuestionId = firstSub.personaQuestions[0].id;
+    personaQuestionName = firstSub.personaQuestions[0].name;
     expect(firstSub.personaQuestions[0]).toHaveProperty('userResponse');
     expect(firstSub.personaQuestions[0]).toHaveProperty('aiValue');
   });
@@ -99,11 +129,12 @@ describe('Persona (e2e)', () => {
   it('GET sub-component page returns personaQuestions with responses', async () => {
     const res = await request(app.getHttpServer())
       .get(
-        `/workspaces/me/persona/schema/persona-components/${personaComponentId}/persona-sub-components/${personaSubComponentId}`,
+        `/workspaces/me/persona/schema/persona-components/${personaComponentSlug}/persona-sub-components/${personaSubComponentSlug}`,
       )
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
+    expect(res.body.slug).toBe(personaSubComponentSlug);
     expect(res.body.id).toBe(personaSubComponentId);
     expect(res.body.personaQuestions.length).toBeGreaterThan(0);
   });
@@ -116,7 +147,7 @@ describe('Persona (e2e)', () => {
         personaSubComponentId,
         responses: [
           {
-            personaQuestionId,
+            name: personaQuestionName,
             userResponse: 'Acme Corp',
           },
         ],
@@ -127,7 +158,7 @@ describe('Persona (e2e)', () => {
 
     const schemaRes = await request(app.getHttpServer())
       .get(
-        `/workspaces/me/persona/schema/persona-components/${personaComponentId}/persona-sub-components/${personaSubComponentId}`,
+        `/workspaces/me/persona/schema/persona-components/${personaComponentSlug}/persona-sub-components/${personaSubComponentSlug}`,
       )
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);

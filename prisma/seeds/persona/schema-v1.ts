@@ -55,26 +55,26 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 options: [
-                  [
-                    "B2B",
-                    "Individual customers buying directly",
-                  ],
-                  [
-                    "B2C",
-                    "Sell products or services to businesses",
-                  ],
-                  [
-                    "B2B2C",
-                    "Sell through businesses to consumers",
-                  ],
-                  [
-                    "D2C",
-                    "No retailers or middlemen involved",
-                  ],
-                  [
-                    "Mixed",
-                    "Operate across more than one model",
-                  ],
+                  {
+                    title: "B2B",
+                    brief: "Individual customers buying directly",
+                  },
+                  {
+                    title: "B2C",
+                    brief: "Sell products or services to businesses",
+                  },
+                  {
+                    title: "B2B2C",
+                    brief: "Sell through businesses to consumers",
+                  },
+                  {
+                    title: "D2C",
+                    brief: "No retailers or middlemen involved",
+                  },
+                  {
+                    title: "Mixed",
+                    brief: "Operate across more than one model",
+                  },
                 ],
               },
             },
@@ -85,34 +85,34 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 options: [
-                  [
-                    "English (US)",
-                    "icon.png",
-                  ],
-                  [
-                    "English (UK)",
-                    "icon.png",
-                  ],
-                  [
-                    "Spanish",
-                    "icon.png",
-                  ],
-                  [
-                    "French",
-                    "icon.png",
-                  ],
-                  [
-                    "German",
-                    "icon.png",
-                  ],
-                  [
-                    "Arabic",
-                    "icon.png",
-                  ],
-                  [
-                    "Other",
-                    "icon.png",
-                  ],
+                  {
+                    title: "English (US)",
+                    icon: "icon.png",
+                  },
+                  {
+                    title: "English (UK)",
+                    icon: "icon.png",
+                  },
+                  {
+                    title: "Spanish",
+                    icon: "icon.png",
+                  },
+                  {
+                    title: "French",
+                    icon: "icon.png",
+                  },
+                  {
+                    title: "German",
+                    icon: "icon.png",
+                  },
+                  {
+                    title: "Arabic",
+                    icon: "icon.png",
+                  },
+                  {
+                    title: "Other",
+                    icon: "icon.png",
+                  },
                 ],
               },
             },
@@ -304,54 +304,54 @@ export const personaSchemaV1 = {
                 max: 1,
                 min: null,
                 options: [
-                  [
-                    "Hero",
-                    "Courageous, determined, driven to overcome challenges",
-                  ],
-                  [
-                    "Sage",
-                    "Wise, trusted, knowledge-driven authority",
-                  ],
-                  [
-                    "Outlaw",
-                    "Rebellious, disruptive, challenges the status quo",
-                  ],
-                  [
-                    "Creator",
-                    "Imaginative, artistic, builds things with meaning",
-                  ],
-                  [
-                    "Caregiver",
-                    "Nurturing, supportive, puts others first",
-                  ],
-                  [
-                    "Ruler",
-                    "Commanding, prestigious, establishes order",
-                  ],
-                  [
-                    "Magician",
-                    "Transformative, visionary, makes dreams happen",
-                  ],
-                  [
-                    "Innocent",
-                    "Optimistic, pure, simple and honest",
-                  ],
-                  [
-                    "Explorer",
-                    "Adventurous, pioneering, seeks new experiences",
-                  ],
-                  [
-                    "Lover",
-                    "Passionate, intimate, creates deep connections",
-                  ],
-                  [
-                    "Jester",
-                    "Playful, humorous, brings joy and lightness",
-                  ],
-                  [
-                    "Everyman",
-                    "Relatable, down-to-earth, inclusive and authentic",
-                  ],
+                  {
+                    title: "Hero",
+                    brief: "Courageous, determined, driven to overcome challenges",
+                  },
+                  {
+                    title: "Sage",
+                    brief: "Wise, trusted, knowledge-driven authority",
+                  },
+                  {
+                    title: "Outlaw",
+                    brief: "Rebellious, disruptive, challenges the status quo",
+                  },
+                  {
+                    title: "Creator",
+                    brief: "Imaginative, artistic, builds things with meaning",
+                  },
+                  {
+                    title: "Caregiver",
+                    brief: "Nurturing, supportive, puts others first",
+                  },
+                  {
+                    title: "Ruler",
+                    brief: "Commanding, prestigious, establishes order",
+                  },
+                  {
+                    title: "Magician",
+                    brief: "Transformative, visionary, makes dreams happen",
+                  },
+                  {
+                    title: "Innocent",
+                    brief: "Optimistic, pure, simple and honest",
+                  },
+                  {
+                    title: "Explorer",
+                    brief: "Adventurous, pioneering, seeks new experiences",
+                  },
+                  {
+                    title: "Lover",
+                    brief: "Passionate, intimate, creates deep connections",
+                  },
+                  {
+                    title: "Jester",
+                    brief: "Playful, humorous, brings joy and lightness",
+                  },
+                  {
+                    title: "Everyman",
+                    brief: "Relatable, down-to-earth, inclusive and authentic",
+                  },
                 ],
               },
             },
@@ -612,38 +612,38 @@ export const personaSchemaV1 = {
                 max: 3,
                 min: null,
                 options: [
-                  [
-                    "Inconsistent content",
-                    "Content varies in quality, tone, or format across channels",
-                  ],
-                  [
-                    "Low engagement",
-                    "Posts and content fail to attract likes, shares, or comments",
-                  ],
-                  [
-                    "No time to create",
-                    "Not enough hours to produce content consistently",
-                  ],
-                  [
-                    "No clear strategy",
-                    "Content lacks direction, goals, or a cohesive plan",
-                  ],
-                  [
-                    "Hard to scale",
-                    "Can't produce more content without proportionally more effort",
-                  ],
-                  [
-                    "Poor ROI",
-                    "Content investment doesn't translate into measurable returns",
-                  ],
-                  [
-                    "Too many tools",
-                    "Managing multiple platforms and tools is overwhelming",
-                  ],
-                  [
-                    "Brand inconsistency",
-                    "Messaging and visuals don't align across touchpoints",
-                  ],
+                  {
+                    title: "Inconsistent content",
+                    brief: "Content varies in quality, tone, or format across channels",
+                  },
+                  {
+                    title: "Low engagement",
+                    brief: "Posts and content fail to attract likes, shares, or comments",
+                  },
+                  {
+                    title: "No time to create",
+                    brief: "Not enough hours to produce content consistently",
+                  },
+                  {
+                    title: "No clear strategy",
+                    brief: "Content lacks direction, goals, or a cohesive plan",
+                  },
+                  {
+                    title: "Hard to scale",
+                    brief: "Can't produce more content without proportionally more effort",
+                  },
+                  {
+                    title: "Poor ROI",
+                    brief: "Content investment doesn't translate into measurable returns",
+                  },
+                  {
+                    title: "Too many tools",
+                    brief: "Managing multiple platforms and tools is overwhelming",
+                  },
+                  {
+                    title: "Brand inconsistency",
+                    brief: "Messaging and visuals don't align across touchpoints",
+                  },
                 ],
               },
             },
@@ -677,15 +677,15 @@ export const personaSchemaV1 = {
                 max: null,
                 min: null,
                 options: [
-                  ["Facebook", "icon.png"],
-                  ["Instagram", "icon.png"],
-                  ["YouTube", "icon.png"],
-                  ["TikTok", "icon.png"],
-                  ["X", "icon.png"],
-                  ["Snapchat", "icon.png"],
-                  ["LinkedIn", "icon.png"],
-                  ["Pinterest", "icon.png"],
-                  ["Discord", "icon.png"],
+                  { title: "Facebook", icon: "icon.png" },
+                  { title: "Instagram", icon: "icon.png" },
+                  { title: "YouTube", icon: "icon.png" },
+                  { title: "TikTok", icon: "icon.png" },
+                  { title: "X", icon: "icon.png" },
+                  { title: "Snapchat", icon: "icon.png" },
+                  { title: "LinkedIn", icon: "icon.png" },
+                  { title: "Pinterest", icon: "icon.png" },
+                  { title: "Discord", icon: "icon.png" },
                 ],
               },
             },

@@ -47,10 +47,10 @@ export class PersonaSchemaService {
   async getPersonaComponent(
     workspaceId: string,
     schemaVersion: number,
-    personaComponentId: number,
+    personaComponentSlug: string,
   ) {
     const component = await this.prisma.personaComponent.findFirst({
-      where: { id: personaComponentId, schemaVersion },
+      where: { slug: personaComponentSlug, schemaVersion },
       include: {
         personaSubComponents: {
           orderBy: { sortOrder: 'asc' },
@@ -75,14 +75,16 @@ export class PersonaSchemaService {
   async getPersonaSubComponent(
     workspaceId: string,
     schemaVersion: number,
-    personaComponentId: number,
-    personaSubComponentId: number,
+    personaComponentSlug: string,
+    personaSubComponentSlug: string,
   ) {
     const subComponent = await this.prisma.personaSubComponent.findFirst({
       where: {
-        id: personaSubComponentId,
-        personaComponentId,
-        personaComponent: { schemaVersion },
+        slug: personaSubComponentSlug,
+        personaComponent: {
+          slug: personaComponentSlug,
+          schemaVersion,
+        },
       },
       include: {
         personaQuestions: {
@@ -268,6 +270,7 @@ export class PersonaSchemaService {
 
     return {
       id: component.id,
+      slug: component.slug,
       label: component.label,
       sortOrder: component.sortOrder,
       personaSubComponents,
@@ -289,6 +292,7 @@ export class PersonaSchemaService {
 
     return {
       id: subComponent.id,
+      slug: subComponent.slug,
       personaComponentId: subComponent.personaComponentId,
       label: subComponent.label,
       title: subComponent.title,

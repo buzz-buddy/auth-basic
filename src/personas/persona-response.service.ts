@@ -29,16 +29,21 @@ export class PersonaResponseService {
       await this.assertPersonaSubComponentExists(dto.personaSubComponentId);
     }
 
-    const questionIds = dto.responses.map((r) => r.personaQuestionId);
+    const names = dto.responses.map((r) => r.name);
     const questions = await this.prisma.personaQuestion.findMany({
-      where: { id: { in: questionIds }, isActive: true },
+      where: { name: { in: names }, isActive: true },
     });
 
-    if (questions.length !== questionIds.length) {
-      throw new NotFoundException('One or more PersonaQuestion records not found');
+    if (questions.length !== names.length) {
+      const found = new Set(questions.map((q) => q.name));
+      const missing = names.filter((name) => !found.has(name));
+      throw new NotFoundException(
+        `Unknown persona question(s): ${missing.join(', ')}`,
+      );
     }
 
-    const questionMap = new Map(questions.map((q) => [q.id, q]));
+    const questionMap = new Map(questions.map((q) => [q.name, q]));
+    const questionIds = questions.map((q) => q.id);
     const existingResponses =
       await this.prisma.workspaceQuestionResponse.findMany({
         where: {
@@ -54,7 +59,7 @@ export class PersonaResponseService {
     );
 
     for (const item of dto.responses) {
-      const question = questionMap.get(item.personaQuestionId)!;
+      const question = questionMap.get(item.name)!;
       await this.validator.validate(question, item.userResponse, {
         workspaceId,
       });
@@ -62,6 +67,7 @@ export class PersonaResponseService {
 
     await this.prisma.$transaction(async (tx) => {
       for (const item of dto.responses) {
+        const question = questionMap.get(item.name)!;
         const valueSource =
           item.valueSource ??
           (item.userResponse === null || item.userResponse === undefined
@@ -72,12 +78,12 @@ export class PersonaResponseService {
           where: {
             workspaceId_personaQuestionId: {
               workspaceId,
-              personaQuestionId: item.personaQuestionId,
+              personaQuestionId: question.id,
             },
           },
           create: {
             workspaceId,
-            personaQuestionId: item.personaQuestionId,
+            personaQuestionId: question.id,
             userResponse: item.userResponse as object,
             valueSource,
           },
@@ -97,12 +103,12 @@ export class PersonaResponseService {
     });
 
     for (const item of dto.responses) {
-      const question = questionMap.get(item.personaQuestionId)!;
+      const question = questionMap.get(item.name)!;
       if (!isFileUploadFieldType(question.fieldType)) {
         continue;
       }
 
-      const existing = existingByQuestionId.get(item.personaQuestionId);
+      const existing = existingByQuestionId.get(question.id);
       const oldKeys = extractFileKeysFromResponse(
         question.fieldType,
         existing?.userResponse,

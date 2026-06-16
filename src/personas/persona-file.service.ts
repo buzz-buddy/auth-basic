@@ -22,14 +22,14 @@ export class PersonaFileService {
 
   async uploadFile(
     workspaceId: string,
-    personaQuestionId: number,
+    questionName: string,
     file: Express.Multer.File,
   ) {
     if (!file) {
       throw new BadRequestException('file is required');
     }
 
-    const question = await this.getFileUploadQuestion(personaQuestionId);
+    const question = await this.getFileUploadQuestion(questionName);
     const config = flattenFieldConfig(question.fieldConfig);
 
     this.assertAllowedMimeType(file, config);
@@ -37,7 +37,7 @@ export class PersonaFileService {
 
     const key = await this.storageService.uploadPersonaFile(
       workspaceId,
-      personaQuestionId,
+      question.name,
       file,
     );
     const previewUrl = await this.storageService.getPresignedReadUrl(key);
@@ -49,11 +49,11 @@ export class PersonaFileService {
 
   async deleteFile(
     workspaceId: string,
-    personaQuestionId: number,
+    questionName: string,
     key: string,
   ) {
-    const question = await this.getFileUploadQuestion(personaQuestionId);
-    this.assertKeyBelongsToQuestion(workspaceId, question.id, key);
+    const question = await this.getFileUploadQuestion(questionName);
+    this.assertKeyBelongsToQuestion(workspaceId, question.name, key);
 
     const saved = await this.prisma.workspaceQuestionResponse.findUnique({
       where: {
@@ -80,13 +80,13 @@ export class PersonaFileService {
     return { success: true };
   }
 
-  private async getFileUploadQuestion(personaQuestionId: number) {
+  private async getFileUploadQuestion(questionName: string) {
     const question = await this.prisma.personaQuestion.findFirst({
-      where: { id: personaQuestionId, isActive: true },
+      where: { name: questionName, isActive: true },
     });
 
     if (!question) {
-      throw new NotFoundException('PersonaQuestion not found');
+      throw new NotFoundException(`Persona question not found: ${questionName}`);
     }
 
     if (!isFileUploadFieldType(question.fieldType)) {
@@ -98,7 +98,7 @@ export class PersonaFileService {
 
   private assertKeyBelongsToQuestion(
     workspaceId: string,
-    personaQuestionId: number,
+    questionName: string,
     key: string,
   ) {
     if (
@@ -106,7 +106,7 @@ export class PersonaFileService {
         this.storageService.getPersonaPrefix(),
         key,
         workspaceId,
-        personaQuestionId,
+        questionName,
       )
     ) {
       throw new BadRequestException('File key does not belong to this question');

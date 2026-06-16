@@ -6,13 +6,14 @@ import {
   IsEnum,
   IsInt,
   IsOptional,
+  IsString,
   ValidateNested,
 } from 'class-validator';
 import { ResponseValueSource } from '@prisma/client';
 
 export class PersonaResponseItemDto {
-  @IsInt()
-  personaQuestionId: number;
+  @IsString()
+  name: string;
 
   @IsDefined()
   userResponse: unknown;

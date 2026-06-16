@@ -182,15 +182,13 @@ model PersonaQuestion {
   id                    Int                         @id @default(autoincrement())
   personaSubComponentId Int
   fieldType             PersonaFieldType
-  name                  String
+  name                  String                      @unique
   label                 String
   isRequired            Boolean                     @default(false)
   fieldConfig           Json?
   isActive              Boolean                     @default(true)
   personaSubComponent   PersonaSubComponent         @relation(fields: [personaSubComponentId], references: [id], onDelete: Cascade)
   responses             WorkspaceQuestionResponse[]
-
-  @@unique([personaSubComponentId, name])
 }
 
 model WorkspaceQuestionResponse {

@@ -67,37 +67,36 @@ export class PersonasController {
     );
   }
 
-  @Get('schema/persona-components/:personaComponentId')
+  @Get('schema/persona-components/:personaComponentSlug')
   @ApiOperation({ summary: 'Get one PersonaComponent with responses' })
   getPersonaComponent(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('personaComponentId', ParseIntPipe) personaComponentId: number,
+    @Param('personaComponentSlug') personaComponentSlug: string,
   ) {
     return this.getContext(user.sub).then(({ workspaceId, persona }) =>
       this.schemaService.getPersonaComponent(
         workspaceId,
         persona.schemaVersion,
-        personaComponentId,
+        personaComponentSlug,
       ),
     );
   }
 
   @Get(
-    'schema/persona-components/:personaComponentId/persona-sub-components/:personaSubComponentId',
+    'schema/persona-components/:personaComponentSlug/persona-sub-components/:personaSubComponentSlug',
   )
   @ApiOperation({ summary: 'Get one PersonaSubComponent wizard page' })
   getPersonaSubComponent(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('personaComponentId', ParseIntPipe) personaComponentId: number,
-    @Param('personaSubComponentId', ParseIntPipe)
-    personaSubComponentId: number,
+    @Param('personaComponentSlug') personaComponentSlug: string,
+    @Param('personaSubComponentSlug') personaSubComponentSlug: string,
   ) {
     return this.getContext(user.sub).then(({ workspaceId, persona }) =>
       this.schemaService.getPersonaSubComponent(
         workspaceId,
         persona.schemaVersion,
-        personaComponentId,
-        personaSubComponentId,
+        personaComponentSlug,
+        personaSubComponentSlug,
       ),
     );
   }
@@ -114,7 +113,7 @@ export class PersonasController {
     );
   }
 
-  @Post('questions/:personaQuestionId/files')
+  @Post('questions/:name/files')
   @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
@@ -132,26 +131,26 @@ export class PersonasController {
   @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
   uploadFile(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('personaQuestionId', ParseIntPipe) personaQuestionId: number,
+    @Param('name') name: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.getContext(user.sub).then(({ workspaceId }) =>
-      this.fileService.uploadFile(workspaceId, personaQuestionId, file),
+      this.fileService.uploadFile(workspaceId, name, file),
     );
   }
 
-  @Delete('questions/:personaQuestionId/files')
+  @Delete('questions/:name/files')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Delete an unsaved persona file upload from S3',
   })
   deleteFile(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('personaQuestionId', ParseIntPipe) personaQuestionId: number,
+    @Param('name') name: string,
     @Body() dto: DeletePersonaFileDto,
   ) {
     return this.getContext(user.sub).then(({ workspaceId }) =>
-      this.fileService.deleteFile(workspaceId, personaQuestionId, dto.key),
+      this.fileService.deleteFile(workspaceId, name, dto.key),
     );
   }
 

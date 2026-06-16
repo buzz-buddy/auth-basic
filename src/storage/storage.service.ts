@@ -82,7 +82,7 @@ export class StorageService {
 
   async uploadPersonaFile(
     workspaceId: string,
-    personaQuestionId: number,
+    questionName: string,
     file: Express.Multer.File,
   ): Promise<string> {
     const extension = extensionForMime(file.mimetype);
@@ -93,7 +93,7 @@ export class StorageService {
     const key = buildPersonaFileKey(
       this.personaPrefix,
       workspaceId,
-      personaQuestionId,
+      questionName,
       extension,
     );
 

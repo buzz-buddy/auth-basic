@@ -61,12 +61,7 @@ export async function seedPersonaSchema(prisma: PrismaClient) {
 
       for (const question of sub.personaQuestions ?? []) {
         await prisma.personaQuestion.upsert({
-          where: {
-            personaSubComponentId_name: {
-              personaSubComponentId: personaSubComponent.id,
-              name: question.name,
-            },
-          },
+          where: { name: question.name },
           create: {
             personaSubComponentId: personaSubComponent.id,
             fieldType: question.fieldType,
@@ -76,6 +71,7 @@ export async function seedPersonaSchema(prisma: PrismaClient) {
             fieldConfig: question.fieldConfig ?? Prisma.JsonNull,
           },
           update: {
+            personaSubComponentId: personaSubComponent.id,
             fieldType: question.fieldType,
             label: question.label,
             isRequired: question.isRequired,
