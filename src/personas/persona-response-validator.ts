@@ -65,6 +65,12 @@ export class PersonaResponseValidator {
     if (userResponse === null || userResponse === undefined) {
       return false;
     }
+    if (question.fieldType === PersonaFieldType.single_broad_selector) {
+      return (
+        Array.isArray(userResponse) &&
+        userResponse.some((item) => this.isValidBriefOption(item))
+      );
+    }
     if (isArrayFieldType(question.fieldType)) {
       return Array.isArray(userResponse) && userResponse.length > 0;
     }
@@ -195,11 +201,11 @@ export class PersonaResponseValidator {
     if (typeof userResponse !== 'string') {
       return 'Must be a string';
     }
-    const { options } = flattenFieldConfig(question.fieldConfig);
-    if (!Array.isArray(options)) {
+    const allowed = this.dropdownOptionValues(question.fieldConfig);
+    if (allowed.length === 0) {
       return 'Question has no options configured';
     }
-    if (!options.includes(userResponse)) {
+    if (!allowed.includes(userResponse)) {
       return 'Must be one of the allowed options';
     }
     return null;
@@ -209,13 +215,45 @@ export class PersonaResponseValidator {
     question: PersonaQuestion,
     userResponse: unknown,
   ) {
-    if (typeof userResponse !== 'string') {
-      return 'Must be a string';
+    if (!Array.isArray(userResponse)) {
+      return 'Must be an array';
     }
-    const allowed = this.broadSelectorValues(question.fieldConfig);
-    if (!allowed.includes(userResponse)) {
-      return 'Must be one of the allowed options';
+
+    const config = flattenFieldConfig(question.fieldConfig);
+    const allowed = this.broadSelectorOptions(question.fieldConfig);
+    if (allowed.length === 0) {
+      return 'Question has no options configured';
     }
+
+    const min = typeof config.min === 'number' ? config.min : 0;
+    const max = typeof config.max === 'number' ? config.max : 1;
+
+    if (userResponse.length < min) {
+      return `Select at least ${min} option(s)`;
+    }
+    if (userResponse.length > max) {
+      return `Select at most ${max} option(s)`;
+    }
+
+    const seenTitles = new Set<string>();
+    for (const item of userResponse) {
+      if (!this.isValidBriefOption(item)) {
+        return 'Each selection must be an object with title and brief';
+      }
+
+      if (seenTitles.has(item.title)) {
+        return 'Selections must be unique';
+      }
+      seenTitles.add(item.title);
+
+      const match = allowed.some(
+        (option) => option.title === item.title && option.brief === item.brief,
+      );
+      if (!match) {
+        return 'All selections must be allowed options';
+      }
+    }
+
     return null;
   }
 
@@ -536,14 +574,62 @@ export class PersonaResponseValidator {
     return null;
   }
 
-  private broadSelectorValues(fieldConfig: Prisma.JsonValue | null): string[] {
+  private isValidBriefOption(
+    item: unknown,
+  ): item is { title: string; brief: string } {
+    if (item === null || typeof item !== 'object' || Array.isArray(item)) {
+      return false;
+    }
+
+    const entry = item as Record<string, unknown>;
+    return (
+      typeof entry.title === 'string' &&
+      entry.title.trim().length > 0 &&
+      typeof entry.brief === 'string' &&
+      entry.brief.trim().length > 0
+    );
+  }
+
+  private broadSelectorOptions(
+    fieldConfig: Prisma.JsonValue | null,
+  ): Array<{ title: string; brief: string }> {
     const { options } = flattenFieldConfig(fieldConfig);
     if (!Array.isArray(options)) {
       return [];
     }
     return options
-      .filter((item): item is [string, string] => Array.isArray(item))
-      .map((item) => item[0]);
+      .filter((item): item is { title: string; brief: string } =>
+        this.isValidBriefOption(item),
+      )
+      .map((item) => ({ title: item.title, brief: item.brief }));
+  }
+
+  private broadSelectorValues(fieldConfig: Prisma.JsonValue | null): string[] {
+    return this.broadSelectorOptions(fieldConfig).map((option) => option.title);
+  }
+
+  private dropdownOptionValues(
+    fieldConfig: Prisma.JsonValue | null,
+  ): string[] {
+    const { options } = flattenFieldConfig(fieldConfig);
+    if (!Array.isArray(options)) {
+      return [];
+    }
+
+    return options.flatMap((item) => {
+      if (typeof item === 'string') {
+        return item.length > 0 ? [item] : [];
+      }
+
+      if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+        const entry = item as Record<string, unknown>;
+        if (typeof entry.value === 'string' && entry.value.trim().length > 0) {
+          return [entry.value];
+        }
+      }
+
+      return [];
+    });
   }
 
   private iconDropdownLabels(fieldConfig: Prisma.JsonValue | null): string[] {
@@ -551,8 +637,20 @@ export class PersonaResponseValidator {
     if (!Array.isArray(options)) {
       return [];
     }
-    return options
-      .filter((item): item is [string, string] => Array.isArray(item))
-      .map((item) => item[0]);
+
+    return options.flatMap((item) => {
+      if (Array.isArray(item) && typeof item[0] === 'string') {
+        return item[0].trim().length > 0 ? [item[0]] : [];
+      }
+
+      if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+        const entry = item as Record<string, unknown>;
+        if (typeof entry.title === 'string' && entry.title.trim().length > 0) {
+          return [entry.title];
+        }
+      }
+
+      return [];
+    });
   }
 }

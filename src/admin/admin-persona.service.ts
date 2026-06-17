@@ -46,6 +46,7 @@ export class AdminPersonaService {
       data: {
         ...(dto.label !== undefined ? { label: dto.label } : {}),
         ...(dto.title !== undefined ? { title: dto.title } : {}),
+        ...(dto.sideTitle !== undefined ? { sideTitle: dto.sideTitle } : {}),
         ...(dto.description !== undefined ? { description: dto.description } : {}),
         ...(dto.sideInfo !== undefined ? { sideInfo: dto.sideInfo } : {}),
         ...(dto.sortOrder !== undefined ? { sortOrder: dto.sortOrder } : {}),
@@ -65,6 +66,7 @@ export class AdminPersonaService {
       where: { id },
       data: {
         ...(dto.label !== undefined ? { label: dto.label } : {}),
+        ...(dto.title !== undefined ? { title: dto.title } : {}),
         ...(dto.sortOrder !== undefined ? { sortOrder: dto.sortOrder } : {}),
       },
     });

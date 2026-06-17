@@ -15,7 +15,7 @@ export const PERSONA_FIELD_TYPE_META: {
   [PersonaFieldType.multi_date_entry]: { responseShape: 'array' },
   [PersonaFieldType.textarea]: { responseShape: 'string' },
   [PersonaFieldType.single_dropdown]: { responseShape: 'string' },
-  [PersonaFieldType.single_broad_selector]: { responseShape: 'string' },
+  [PersonaFieldType.single_broad_selector]: { responseShape: 'array' },
   [PersonaFieldType.single_dropdown_with_icon]: { responseShape: 'string' },
   [PersonaFieldType.multi_radio]: { responseShape: 'array' },
   [PersonaFieldType.multi_radio_with_icon]: { responseShape: 'array' },

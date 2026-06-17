@@ -23,11 +23,13 @@ export async function seedPersonaSchema(prisma: PrismaClient) {
       create: {
         slug: component.slug,
         label: component.label,
+        title: component.title,
         sortOrder: component.sortOrder,
         schemaVersion: data.schemaVersion,
       },
       update: {
         label: component.label,
+        title: component.title,
         sortOrder: component.sortOrder,
         schemaVersion: data.schemaVersion,
       },
@@ -46,6 +48,7 @@ export async function seedPersonaSchema(prisma: PrismaClient) {
           slug: sub.slug,
           label: sub.label,
           title: sub.title,
+          sideTitle: sub.sideTitle,
           description: sub.description,
           sideInfo: sub.sideInfo,
           sortOrder: sub.sortOrder,
@@ -53,6 +56,7 @@ export async function seedPersonaSchema(prisma: PrismaClient) {
         update: {
           label: sub.label,
           title: sub.title,
+          sideTitle: sub.sideTitle,
           description: sub.description,
           sideInfo: sub.sideInfo,
           sortOrder: sub.sortOrder,

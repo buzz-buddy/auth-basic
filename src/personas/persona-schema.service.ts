@@ -272,6 +272,7 @@ export class PersonaSchemaService {
       id: component.id,
       slug: component.slug,
       label: component.label,
+      title: component.title,
       sortOrder: component.sortOrder,
       personaSubComponents,
     };
@@ -296,6 +297,7 @@ export class PersonaSchemaService {
       personaComponentId: subComponent.personaComponentId,
       label: subComponent.label,
       title: subComponent.title,
+      sideTitle: subComponent.sideTitle,
       description: subComponent.description,
       sideInfo: subComponent.sideInfo,
       sortOrder: subComponent.sortOrder,

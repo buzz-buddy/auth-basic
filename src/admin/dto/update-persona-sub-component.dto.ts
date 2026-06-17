@@ -13,6 +13,11 @@ export class UpdatePersonaSubComponentDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(500)
+  sideTitle?: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(2000)
   description?: string;
 

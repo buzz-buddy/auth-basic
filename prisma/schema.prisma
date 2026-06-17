@@ -157,6 +157,7 @@ model PersonaComponent {
   id                   Int                   @id @default(autoincrement())
   slug                 String                @unique
   label                String
+  title                String?
   sortOrder            Int
   schemaVersion        Int                   @default(1)
   personaSubComponents PersonaSubComponent[]
@@ -168,6 +169,7 @@ model PersonaSubComponent {
   slug               String
   label              String
   title              String?
+  sideTitle          String?
   description        String?
   sideInfo           String?           @db.Text
   sortOrder          Int

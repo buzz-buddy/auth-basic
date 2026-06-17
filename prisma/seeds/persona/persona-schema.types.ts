@@ -12,6 +12,7 @@ export type PersonaSchemaSeedSubComponent = {
   slug: string;
   label: string;
   title?: string;
+  sideTitle?: string;
   description?: string;
   sideInfo?: string;
   sortOrder: number;

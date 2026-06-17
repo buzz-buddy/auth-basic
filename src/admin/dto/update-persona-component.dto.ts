@@ -7,6 +7,11 @@ export class UpdatePersonaComponentDto {
   label?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  title?: string;
+
+  @IsOptional()
   @IsInt()
   sortOrder?: number;
 }
