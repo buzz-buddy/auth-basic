@@ -109,7 +109,12 @@ export class PersonasController {
     @Body() dto: UpsertPersonaResponsesDto,
   ) {
     return this.getContext(user.sub).then(({ workspaceId, persona }) =>
-      this.responseService.upsertResponses(workspaceId, persona.id, dto),
+      this.responseService.upsertResponses(
+        workspaceId,
+        persona.id,
+        persona.schemaVersion,
+        dto,
+      ),
     );
   }
 

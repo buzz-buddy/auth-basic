@@ -122,8 +122,11 @@ describe('Persona (e2e)', () => {
 
     personaQuestionId = firstSub.personaQuestions[0].id;
     personaQuestionName = firstSub.personaQuestions[0].name;
-    expect(firstSub.personaQuestions[0]).toHaveProperty('userResponse');
-    expect(firstSub.personaQuestions[0]).toHaveProperty('aiValue');
+    expect(firstSub.personaQuestions[0]).toMatchObject({
+      responseType: expect.stringMatching(/^(string|number|array)$/),
+      userResponse: expect.anything(),
+      aiValue: expect.anything(),
+    });
   });
 
   it('GET sub-component page returns personaQuestions with responses', async () => {
@@ -137,6 +140,9 @@ describe('Persona (e2e)', () => {
     expect(res.body.slug).toBe(personaSubComponentSlug);
     expect(res.body.id).toBe(personaSubComponentId);
     expect(res.body.personaQuestions.length).toBeGreaterThan(0);
+    for (const question of res.body.personaQuestions) {
+      expect(question.responseType).toMatch(/^(string|number|array)$/);
+    }
   });
 
   it('PUT /workspaces/me/persona/responses saves userResponse', async () => {
@@ -144,7 +150,8 @@ describe('Persona (e2e)', () => {
       .put('/workspaces/me/persona/responses')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        personaSubComponentId,
+        personaComponentSlug,
+        personaSubComponentSlug,
         responses: [
           {
             name: personaQuestionName,

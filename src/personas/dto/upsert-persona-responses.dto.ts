@@ -4,7 +4,6 @@ import {
   IsArray,
   IsDefined,
   IsEnum,
-  IsInt,
   IsOptional,
   IsString,
   ValidateNested,
@@ -25,8 +24,12 @@ export class PersonaResponseItemDto {
 
 export class UpsertPersonaResponsesDto {
   @IsOptional()
-  @IsInt()
-  personaSubComponentId?: number;
+  @IsString()
+  personaComponentSlug?: string;
+
+  @IsOptional()
+  @IsString()
+  personaSubComponentSlug?: string;
 
   @IsArray()
   @ArrayMinSize(1)

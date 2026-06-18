@@ -7,8 +7,13 @@ export {
   isNumericFieldType,
   isPersonaFieldType,
   PERSONA_FIELD_TYPE_META,
+  responseTypeForFieldType,
 } from './persona-field-type.util';
-export type { PersonaFieldTypeMeta, PersonaResponseShape } from './persona-field-type.util';
+export type {
+  PersonaFieldTypeMeta,
+  PersonaResponseShape,
+  PersonaResponseType,
+} from './persona-field-type.util';
 
 export function flattenFieldConfig(
   fieldConfig: Prisma.JsonValue | null,

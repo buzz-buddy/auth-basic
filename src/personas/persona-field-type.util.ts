@@ -2,6 +2,9 @@ import { PersonaFieldType } from '../common/enums/persona-field-type.enum';
 
 export type PersonaResponseShape = 'string' | 'array' | 'number';
 
+/** API-facing name for the JSON shape of `userResponse`. */
+export type PersonaResponseType = PersonaResponseShape;
+
 export type PersonaFieldTypeMeta = {
   responseShape: PersonaResponseShape;
 };
@@ -53,6 +56,12 @@ export function isArrayFieldType(fieldType: PersonaFieldType): boolean {
 
 export function isNumericFieldType(fieldType: PersonaFieldType): boolean {
   return PERSONA_FIELD_TYPE_META[fieldType].responseShape === 'number';
+}
+
+export function responseTypeForFieldType(
+  fieldType: PersonaFieldType,
+): PersonaResponseType {
+  return PERSONA_FIELD_TYPE_META[fieldType].responseShape;
 }
 
 export function defaultResponseValue(

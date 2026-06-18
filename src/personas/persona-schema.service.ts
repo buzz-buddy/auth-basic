@@ -13,6 +13,7 @@ import { StorageService } from '../storage/storage.service';
 import {
   defaultResponseValue,
   flattenFieldConfig,
+  responseTypeForFieldType,
 } from './persona-field.util';
 import {
   extractFileKeysFromResponse,
@@ -199,12 +200,8 @@ export class PersonaSchemaService {
       where: { id: personaId },
     });
 
-    const progress = await this.getProgress(workspaceId, persona);
-    const status =
-      progress.totalRequired > 0 &&
-      progress.answeredRequired === progress.totalRequired
-        ? PersonaStatus.COMPLETE
-        : PersonaStatus.DRAFT;
+    // Keep personas in DRAFT until all components are seeded; re-enable COMPLETE later.
+    const status = PersonaStatus.DRAFT;
 
     if (status !== persona.status) {
       await this.prisma.persona.update({
@@ -317,6 +314,7 @@ export class PersonaSchemaService {
       id: question.id,
       personaSubComponentId: question.personaSubComponentId,
       fieldType: question.fieldType,
+      responseType: responseTypeForFieldType(question.fieldType),
       name: question.name,
       label: question.label,
       isRequired: question.isRequired,

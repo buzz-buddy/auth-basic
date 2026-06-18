@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ResponseValueSource } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
@@ -23,11 +27,14 @@ export class PersonaResponseService {
   async upsertResponses(
     workspaceId: string,
     personaId: string,
+    schemaVersion: number,
     dto: UpsertPersonaResponsesDto,
   ) {
-    if (dto.personaSubComponentId !== undefined) {
-      await this.assertPersonaSubComponentExists(dto.personaSubComponentId);
-    }
+    const personaSubComponentId = await this.resolveOptionalSubComponentId(
+      schemaVersion,
+      dto.personaComponentSlug,
+      dto.personaSubComponentSlug,
+    );
 
     const names = dto.responses.map((r) => r.name);
     const questions = await this.prisma.personaQuestion.findMany({
@@ -94,10 +101,10 @@ export class PersonaResponseService {
         });
       }
 
-      if (dto.personaSubComponentId !== undefined) {
+      if (personaSubComponentId !== undefined) {
         await tx.persona.update({
           where: { id: personaId },
-          data: { currentPersonaSubComponentId: dto.personaSubComponentId },
+          data: { currentPersonaSubComponentId: personaSubComponentId },
         });
       }
     });
@@ -161,12 +168,52 @@ export class PersonaResponseService {
     };
   }
 
-  private async assertPersonaSubComponentExists(personaSubComponentId: number) {
-    const exists = await this.prisma.personaSubComponent.findUnique({
-      where: { id: personaSubComponentId },
+  private async resolveOptionalSubComponentId(
+    schemaVersion: number,
+    personaComponentSlug?: string,
+    personaSubComponentSlug?: string,
+  ): Promise<number | undefined> {
+    if (
+      personaComponentSlug === undefined &&
+      personaSubComponentSlug === undefined
+    ) {
+      return undefined;
+    }
+
+    if (!personaComponentSlug || !personaSubComponentSlug) {
+      throw new BadRequestException(
+        'personaComponentSlug and personaSubComponentSlug must be provided together',
+      );
+    }
+
+    const subComponent = await this.resolveSubComponentBySlugs(
+      schemaVersion,
+      personaComponentSlug,
+      personaSubComponentSlug,
+    );
+
+    return subComponent.id;
+  }
+
+  private async resolveSubComponentBySlugs(
+    schemaVersion: number,
+    personaComponentSlug: string,
+    personaSubComponentSlug: string,
+  ) {
+    const subComponent = await this.prisma.personaSubComponent.findFirst({
+      where: {
+        slug: personaSubComponentSlug,
+        personaComponent: {
+          slug: personaComponentSlug,
+          schemaVersion,
+        },
+      },
     });
-    if (!exists) {
+
+    if (!subComponent) {
       throw new NotFoundException('PersonaSubComponent not found');
     }
+
+    return subComponent;
   }
 }
