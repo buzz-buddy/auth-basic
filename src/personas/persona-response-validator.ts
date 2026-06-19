@@ -3,7 +3,7 @@ import { PersonaFieldType, PersonaQuestion, Prisma } from '@prisma/client';
 import { badRequestWithFieldErrors } from '../common/exceptions/field-http.exception';
 import { StorageService } from '../storage/storage.service';
 import { isPersonaFileKeyForQuestion } from './persona-file.util';
-import { flattenFieldConfig, isArrayFieldType, isNumericFieldType } from './persona-field.util';
+import { flattenFieldConfig, isArrayFieldType, isEmptyPersonaResponse, isNumericFieldType } from './persona-field.util';
 
 type ValidationContext = {
   workspaceId: string;
@@ -27,6 +27,8 @@ export class PersonaResponseValidator {
     [PersonaFieldType.textarea]: (q, v) => this.validateText(q, v),
     [PersonaFieldType.single_dropdown]: (q, v) =>
       this.validateSingleOption(q, v),
+    [PersonaFieldType.single_banner_selector]: (q, v) =>
+      this.validateBannerSelector(q, v),
     [PersonaFieldType.single_broad_selector]: (q, v) =>
       this.validateBroadSelector(q, v),
     [PersonaFieldType.single_dropdown_with_icon]: (q, v) =>
@@ -38,7 +40,7 @@ export class PersonaResponseValidator {
       this.validateMultiRadioWithBrief(q, v),
     [PersonaFieldType.multi_slider]: (q, v) => this.validateMultiSlider(q, v),
     [PersonaFieldType.single_slider]: (q, v) => this.validateSingleSlider(q, v),
-    [PersonaFieldType.radio]: (q, v) => this.validateSingleOption(q, v),
+    [PersonaFieldType.switch]: (q, v) => this.validateSingleOption(q, v),
     [PersonaFieldType.file_upload_single]: (q, v, ctx) =>
       this.validateFileUploadSingle(q, v, ctx),
     [PersonaFieldType.file_upload_multiple]: (q, v, ctx) =>
@@ -51,6 +53,21 @@ export class PersonaResponseValidator {
     userResponse: unknown,
     context: ValidationContext,
   ): Promise<void> {
+    if (isEmptyPersonaResponse(userResponse)) {
+      if (!question.isRequired) {
+        return;
+      }
+
+      throw badRequestWithFieldErrors(
+        {
+          [question.name]: [
+            `${question.name} should not be null or undefined`,
+          ],
+        },
+        'Validation failed',
+      );
+    }
+
     const validator = this.validators[question.fieldType];
     const error = await validator(question, userResponse, context);
     if (error) {
@@ -62,7 +79,7 @@ export class PersonaResponseValidator {
   }
 
   isAnswered(question: PersonaQuestion, userResponse: unknown): boolean {
-    if (userResponse === null || userResponse === undefined) {
+    if (isEmptyPersonaResponse(userResponse)) {
       return false;
     }
     if (question.fieldType === PersonaFieldType.single_broad_selector) {
@@ -202,6 +219,23 @@ export class PersonaResponseValidator {
       return 'Must be a string';
     }
     const allowed = this.dropdownOptionValues(question.fieldConfig);
+    if (allowed.length === 0) {
+      return 'Question has no options configured';
+    }
+    if (!allowed.includes(userResponse)) {
+      return 'Must be one of the allowed options';
+    }
+    return null;
+  }
+
+  private validateBannerSelector(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    if (typeof userResponse !== 'string') {
+      return 'Must be a string';
+    }
+    const allowed = this.bannerSelectorSlugs(question.fieldConfig);
     if (allowed.length === 0) {
       return 'Question has no options configured';
     }
@@ -401,7 +435,7 @@ export class PersonaResponseValidator {
     userResponse: unknown,
     context: ValidationContext,
   ) {
-    if (userResponse === '' || userResponse === null || userResponse === undefined) {
+    if (isEmptyPersonaResponse(userResponse)) {
       return question.isRequired ? 'A file is required' : null;
     }
 
@@ -625,6 +659,24 @@ export class PersonaResponseValidator {
         const entry = item as Record<string, unknown>;
         if (typeof entry.value === 'string' && entry.value.trim().length > 0) {
           return [entry.value];
+        }
+      }
+
+      return [];
+    });
+  }
+
+  private bannerSelectorSlugs(fieldConfig: Prisma.JsonValue | null): string[] {
+    const { options } = flattenFieldConfig(fieldConfig);
+    if (!Array.isArray(options)) {
+      return [];
+    }
+
+    return options.flatMap((item) => {
+      if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+        const entry = item as Record<string, unknown>;
+        if (typeof entry.slug === 'string' && entry.slug.trim().length > 0) {
+          return [entry.slug];
         }
       }
 

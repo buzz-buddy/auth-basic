@@ -12,6 +12,7 @@ import {
   extractFileKeysFromResponse,
   isFileUploadFieldType,
 } from './persona-file.util';
+import { isEmptyPersonaResponse } from './persona-field.util';
 import { PersonaResponseValidator } from './persona-response-validator';
 import { PersonaSchemaService } from './persona-schema.service';
 
@@ -77,7 +78,7 @@ export class PersonaResponseService {
         const question = questionMap.get(item.name)!;
         const valueSource =
           item.valueSource ??
-          (item.userResponse === null || item.userResponse === undefined
+          (isEmptyPersonaResponse(item.userResponse)
             ? ResponseValueSource.EMPTY
             : ResponseValueSource.USER);
 

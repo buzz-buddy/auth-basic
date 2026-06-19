@@ -28,6 +28,19 @@ export function flattenFieldConfig(
   return fieldConfig as Record<string, unknown>;
 }
 
+export function isEmptyPersonaResponse(userResponse: unknown): boolean {
+  if (userResponse === null || userResponse === undefined) {
+    return true;
+  }
+  if (typeof userResponse === 'string' && userResponse.length === 0) {
+    return true;
+  }
+  if (Array.isArray(userResponse) && userResponse.length === 0) {
+    return true;
+  }
+  return false;
+}
+
 export function fieldConfigFromDto(
   fieldConfig?: Record<string, unknown>,
 ): Prisma.InputJsonValue | typeof Prisma.JsonNull | undefined {

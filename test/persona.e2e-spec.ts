@@ -176,6 +176,65 @@ describe('Persona (e2e)', () => {
     expect(question.userResponse).toBe('Acme Corp');
   });
 
+  it('PUT /workspaces/me/persona/responses accepts null for optional questions', async () => {
+    const res = await request(app.getHttpServer())
+      .put('/workspaces/me/persona/responses')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        personaComponentSlug: 'content_strategy',
+        personaSubComponentSlug: 'compliance',
+        responses: [
+          {
+            name: 'industry_compliance',
+            userResponse: null,
+          },
+        ],
+      })
+      .expect(200);
+
+    expect(res.body.success).toBe(true);
+  });
+
+  it('PUT /workspaces/me/persona/responses accepts empty string for optional questions', async () => {
+    const res = await request(app.getHttpServer())
+      .put('/workspaces/me/persona/responses')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        personaComponentSlug: 'content_strategy',
+        personaSubComponentSlug: 'compliance',
+        responses: [
+          {
+            name: 'industry_compliance',
+            userResponse: '',
+          },
+        ],
+      })
+      .expect(200);
+
+    expect(res.body.success).toBe(true);
+  });
+
+  it('PUT /workspaces/me/persona/responses reports required question name when userResponse is null', async () => {
+    const res = await request(app.getHttpServer())
+      .put('/workspaces/me/persona/responses')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        personaComponentSlug,
+        personaSubComponentSlug,
+        responses: [
+          {
+            name: 'business_name',
+            userResponse: null,
+          },
+        ],
+      })
+      .expect(400);
+
+    expect(res.body.errors).toEqual({
+      business_name: ['business_name should not be null or undefined'],
+    });
+  });
+
   it('PATCH /workspaces/me/persona/location updates resume', async () => {
     const res = await request(app.getHttpServer())
       .patch('/workspaces/me/persona/location')

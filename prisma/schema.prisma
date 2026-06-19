@@ -42,6 +42,7 @@ enum PersonaFieldType {
   multi_date_entry
   textarea
   single_dropdown
+  single_banner_selector
   single_broad_selector
   single_dropdown_with_icon
   multi_radio
@@ -49,7 +50,7 @@ enum PersonaFieldType {
   multi_radio_with_brief
   multi_slider
   single_slider
-  radio
+  switch
   file_upload_single
   file_upload_multiple
   range_slider

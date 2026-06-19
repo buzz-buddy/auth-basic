@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
 import {
+  Allow,
   ArrayMinSize,
   IsArray,
-  IsDefined,
   IsEnum,
   IsOptional,
   IsString,
@@ -14,7 +14,7 @@ export class PersonaResponseItemDto {
   @IsString()
   name: string;
 
-  @IsDefined()
+  @Allow()
   userResponse: unknown;
 
   @IsOptional()

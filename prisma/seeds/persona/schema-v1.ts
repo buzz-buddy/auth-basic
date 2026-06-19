@@ -411,7 +411,7 @@ export const personaSchemaV1 = {
           personaQuestions: [
             {
               name: "include_founder_voice",
-              fieldType: PersonaFieldType.radio,
+              fieldType: PersonaFieldType.switch,
               label: "Include founder voice in content?",
               isRequired: true,
               fieldConfig: {
@@ -944,19 +944,83 @@ export const personaSchemaV1 = {
           personaQuestions: [
             {
               name: "primary_content_mode",
-              fieldType: PersonaFieldType.single_dropdown,
+              fieldType: PersonaFieldType.single_banner_selector,
               label: "Primary Content Mode",
               isRequired: true,
               fieldConfig: {
                 options: [
-                  "Thought Leadership",
-                  "Promotional",
-                  "Storytelling",
-                  "Educational Series",
-                  "Behind-the-Scenes",
-                  "Product Showcase",
-                  "Community Building",
-                  "Mixed / Auto",
+                  {
+                    title: "Thought Leadership",
+                    brief:
+                      "Share expert insights and industry perspectives that position your brand as the go-to authority in your space.",
+                    recommendReason: "Establishes trust with decision-makers before they are ready to buy.",
+                    isRecommended: false,
+                    icon: "🧠",
+                    slug: "thought-leadership",
+                  },
+                  {
+                    title: "Promotional",
+                    brief:
+                      "Lead with offers, launches, and clear calls-to-action that turn attention into revenue.",
+                    recommendReason: "Builds credibility and attracts high-intent prospects.",
+                    isRecommended: true,
+                    icon: "🛍️",
+                    slug: "promotional",
+                  },
+                  {
+                    title: "Storytelling",
+                    brief:
+                      "Use narrative arcs and personal moments to make your brand memorable and emotionally resonant.",
+                    recommendReason: "Deepens audience connection and improves recall across channels.",
+                    isRecommended: false,
+                    icon: "🎤",
+                    slug: "storytelling",
+                  },
+                  {
+                    title: "Educational Series",
+                    brief:
+                      "Break complex topics into structured lessons that teach your audience something useful over time.",
+                    recommendReason: "Drives saves and shares while nurturing long-term followers.",
+                    isRecommended: false,
+                    icon: "📚",
+                    slug: "educational-series",
+                  },
+                  {
+                    title: "Behind-the-Scenes",
+                    brief:
+                      "Pull back the curtain on how you work, who you are, and what happens before the polished post.",
+                    recommendReason: "Humanizes your brand and increases authentic engagement.",
+                    isRecommended: false,
+                    icon: "🎥",
+                    slug: "behind-the-scenes",
+                  },
+                  {
+                    title: "Product Showcase",
+                    brief:
+                      "Highlight features, benefits, and real-world use cases so people understand what you offer and why it matters.",
+                    recommendReason: "Shortens the path from discovery to consideration for buyers.",
+                    isRecommended: false,
+                    icon: "📦",
+                    slug: "product-showcase",
+                  },
+                  {
+                    title: "Community Building",
+                    brief:
+                      "Spark conversations, celebrate customers, and create content that invites people to participate—not just watch.",
+                    recommendReason: "Grows loyalty and turns followers into advocates.",
+                    isRecommended: false,
+                    icon: "🤝",
+                    slug: "community-building",
+                  },
+                  {
+                    title: "Mixed / Auto",
+                    brief:
+                      "Let BUZZZED balance formats based on your goals, mixing value, promotion, and personality automatically.",
+                    recommendReason: "Keeps your feed fresh without locking into one content style.",
+                    isRecommended: false,
+                    icon: "🎨",
+                    slug: "mixed-auto",
+                  }                
                 ],
               },
             },
@@ -1009,7 +1073,7 @@ export const personaSchemaV1 = {
             },
             {
               name: "profanity_edge",
-              fieldType: PersonaFieldType.radio,
+              fieldType: PersonaFieldType.single_dropdown,
               label: "Profanity / Edge",
               isRequired: false,
               fieldConfig: {
@@ -1022,7 +1086,7 @@ export const personaSchemaV1 = {
             },
             {
               name: "brand_safety_level",
-              fieldType: PersonaFieldType.radio,
+              fieldType: PersonaFieldType.single_dropdown,
               label: "Brand Safety Level",
               isRequired: false,
               fieldConfig: {
@@ -1053,7 +1117,9 @@ export const personaSchemaV1 = {
                 max: 5,
                 min: null,
                 nameMax: 250,
-                addButtonLabel: "Add date",
+                genericLabel: "Event",
+                textPlaceholder: "Add short description about the event.",
+
               },
             },
             {
@@ -1065,7 +1131,8 @@ export const personaSchemaV1 = {
                 max: 5,
                 min: null,
                 nameMax: 250,
-                addButtonLabel: "Add date",
+                genericLabel: "Campaign",
+                textPlaceholder: "Add short description about the campaign.",
               },
             },
           ],
