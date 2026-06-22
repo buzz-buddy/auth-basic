@@ -940,7 +940,7 @@ export const personaSchemaV1 = {
           sideTitle: "Primary Content Mode",
           description: "This sets the strategic voice across all your posts.",
           sideInfo: "",
-          sortOrder: 1,
+          sortOrder: 2,
           personaQuestions: [
             {
               name: "primary_content_mode",
@@ -1033,7 +1033,7 @@ export const personaSchemaV1 = {
           sideTitle: "Compliance & Guardrails",
           description: "Set once — they apply to every piece of content BUZZZED creates.",
           sideInfo: "",
-          sortOrder: 1,
+          sortOrder: 3,
           personaQuestions: [
             {
               name: "industry_compliance",
@@ -1106,7 +1106,7 @@ export const personaSchemaV1 = {
           sideTitle: "Key Dates",
           description: "Optional — key dates unlock launch-campaign templates automatically.",
           sideInfo: "",
-          sortOrder: 1,
+          sortOrder: 4,
           personaQuestions: [
             {
               name: "upcoming_launches_or_events",
@@ -1142,19 +1142,129 @@ export const personaSchemaV1 = {
     {
       slug: "channels_cadence",
       label: "Channels & Cadence",
-      title: "Choose where and when to post.",
+      title: "Choose where and when to publish .",
       sortOrder: 4,
       personaSubComponents: [
         {
-          slug: "basics",
-          label: "Basics",
-          title: "Here's what BUZZZED found",
-          sideTitle: "Here's what BUZZZED found",
-          description: "We analyzed your website and pre-filled your project details. Review and edit anything before continuing.",
+          slug: "platform_selection",
+          label: "Platforms",
+          title: "Platform Selection",
+          sideTitle: "Where will you show up?",
+          description: "Toggle platforms on. AI tailors format and tone for each one.",
           sideInfo: "",
           sortOrder: 1,
-          personaQuestions: [],
+          personaQuestions: [
+            {
+              name: "social_feed_platforms",
+              fieldType: PersonaFieldType.multi_platform_selector,
+              label: "Social Feed",
+              isRequired: false,
+              fieldConfig: {
+                postsPerWeekMin: 1,
+                postsPerWeekMax: 14,
+                options: [
+                  { slug: "instagram", title: "Instagram", categoryLabel: "Social Feed", icon: "instagram" },
+                  { slug: "facebook", title: "Facebook", categoryLabel: "Social Feed", icon: "facebook" },
+                  { slug: "linkedin", title: "LinkedIn", categoryLabel: "Social Feed", icon: "linkedin" },
+                  { slug: "x", title: "X", categoryLabel: "Social Feed", icon: "x" },
+                  { slug: "threads", title: "Threads", categoryLabel: "Social Feed", icon: "threads" },
+                  { slug: "pinterest", title: "Pinterest", categoryLabel: "Social Feed", icon: "pinterest" }
+                ],
+              },
+            },
+            {
+              name: "short_form_video_platforms",
+              fieldType: PersonaFieldType.multi_platform_selector,
+              label: "Short-form Video",
+              isRequired: false,
+              fieldConfig: {
+                postsPerWeekMin: 1,
+                postsPerWeekMax: 14,
+                options: [
+                  { slug: "instagram", title: "Instagram Reels", categoryLabel: "Short-form Video", icon: "instagram" },
+                  { slug: "tiktok", title: "TikTok", categoryLabel: "Short-form Video", icon: "tiktok" },
+                  { slug: "snapchat", title: "Snapchat Spotlight", categoryLabel: "Short-form Video", icon: "snapchat" },
+                  { slug: "youtube", title: "YouTube Shorts", categoryLabel: "Short-form Video", icon: "youtube" },
+                ]
+              },
+            },
+            {
+              name: "long_form_video_platforms",
+              fieldType: PersonaFieldType.multi_platform_selector,
+              label: "Long-form Video",
+              isRequired: false,
+              fieldConfig: {
+                postsPerWeekMin: 1,
+                postsPerWeekMax: 14,
+                options: [
+                  { slug: "youtube", title: "YouTube", categoryLabel: "Long-form Video", icon: "youtube" },
+                  { slug: "vimeo", title: "Vimeo", categoryLabel: "Long-form Video", icon: "vimeo" },
+                ]
+              },
+            },
+            {
+              name: "stories_platforms",
+              fieldType: PersonaFieldType.multi_platform_selector,
+              label: "Stories",
+              isRequired: false,
+              fieldConfig: {
+                postsPerWeekMin: 1,
+                postsPerWeekMax: 14,
+                options: [
+                  { slug: "instagram", title: "Instagram Stories", categoryLabel: "Stories", icon: "instagram" },
+                  { slug: "snapchat", title: "Snapchat Stories", categoryLabel: "Stories", icon: "snapchat" },
+                ]
+              },
+            }
+          ],
         },
+        {
+          slug: "schedule",
+          label: "Schedule",
+          title: "Schedule Preferences",
+          sideTitle: "Schedule Preferences",
+          description: "When will you post? AI adapts timing per platform automatically.         ",
+          sideInfo: "",
+          sortOrder: 2,
+          personaQuestions: [
+            {
+              name: "content_scheduling_preference",
+              fieldType: PersonaFieldType.group_radio,
+              label: "How would you like content scheduled?",
+              isRequired: true,
+              fieldConfig: {
+                max: null,
+                min: null,
+                options: [
+                  {
+                    value: "automatic",
+                    label: "Optimize automatically",
+                    description: "BUZZZED will find the best times to post.",
+                    isRecommended: true,
+                  },
+                  {
+                    value: "manual",
+                    label: "I'll choose my posting schedule",
+                    description: "I want to set my own days and times.",
+                    isRecommended: false,
+                  },
+                ],
+              },
+            },
+          ]
+        },
+        {
+          slug: "formats",
+          label: "Formats",
+          title: "Content Formats",
+          sideTitle: "Content Formats",
+          description: "Select the formats you want BUZZZED to generate.         ",
+          sideInfo: "",
+          sortOrder: 3,
+          personaQuestions: [
+
+          ]
+        }
       ],
     },
     {

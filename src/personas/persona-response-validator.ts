@@ -46,6 +46,8 @@ export class PersonaResponseValidator {
     [PersonaFieldType.file_upload_multiple]: (q, v, ctx) =>
       this.validateFileUploadMultiple(q, v, ctx),
     [PersonaFieldType.range_slider]: (q, v) => this.validateRangeSlider(q, v),
+    [PersonaFieldType.multi_platform_selector]: (q, v) =>
+      this.validateMultiPlatformSelector(q, v),
   };
 
   async validate(
@@ -86,6 +88,12 @@ export class PersonaResponseValidator {
       return (
         Array.isArray(userResponse) &&
         userResponse.some((item) => this.isValidBriefOption(item))
+      );
+    }
+    if (question.fieldType === PersonaFieldType.multi_platform_selector) {
+      return (
+        Array.isArray(userResponse) &&
+        userResponse.some((item) => this.isValidPlatformSelection(item))
       );
     }
     if (isArrayFieldType(question.fieldType)) {
@@ -515,6 +523,51 @@ export class PersonaResponseValidator {
     return null;
   }
 
+  private validateMultiPlatformSelector(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    if (!Array.isArray(userResponse)) {
+      return 'Must be an array';
+    }
+
+    const config = flattenFieldConfig(question.fieldConfig);
+    const allowed = this.bannerSelectorSlugs(question.fieldConfig);
+    if (allowed.length === 0) {
+      return 'Question has no options configured';
+    }
+
+    const postsPerWeekMin =
+      typeof config.postsPerWeekMin === 'number' ? config.postsPerWeekMin : 1;
+    const postsPerWeekMax =
+      typeof config.postsPerWeekMax === 'number' ? config.postsPerWeekMax : 14;
+
+    const seenSlugs = new Set<string>();
+    for (const item of userResponse) {
+      if (!this.isValidPlatformSelection(item)) {
+        return 'Each selection must have a slug and postsPerWeek';
+      }
+
+      if (!allowed.includes(item.slug)) {
+        return 'All selections must be allowed platforms';
+      }
+
+      if (seenSlugs.has(item.slug)) {
+        return 'Selections must be unique';
+      }
+      seenSlugs.add(item.slug);
+
+      if (
+        item.postsPerWeek < postsPerWeekMin ||
+        item.postsPerWeek > postsPerWeekMax
+      ) {
+        return `postsPerWeek must be between ${postsPerWeekMin} and ${postsPerWeekMax}`;
+      }
+    }
+
+    return null;
+  }
+
   private validateMultiRadio(question: PersonaQuestion, userResponse: unknown) {
     if (!Array.isArray(userResponse)) {
       return 'Must be an array';
@@ -621,6 +674,22 @@ export class PersonaResponseValidator {
       entry.title.trim().length > 0 &&
       typeof entry.brief === 'string' &&
       entry.brief.trim().length > 0
+    );
+  }
+
+  private isValidPlatformSelection(
+    item: unknown,
+  ): item is { slug: string; postsPerWeek: number } {
+    if (item === null || typeof item !== 'object' || Array.isArray(item)) {
+      return false;
+    }
+
+    const entry = item as Record<string, unknown>;
+    return (
+      typeof entry.slug === 'string' &&
+      entry.slug.trim().length > 0 &&
+      typeof entry.postsPerWeek === 'number' &&
+      Number.isFinite(entry.postsPerWeek)
     );
   }
 
