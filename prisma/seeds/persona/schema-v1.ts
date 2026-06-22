@@ -425,8 +425,16 @@ export const personaSchemaV1 = {
               name: "founder_name",
               fieldType: PersonaFieldType.text,
               label: "Founder Name",
-              isRequired: true,
+              isRequired: false,
               fieldConfig: {
+                enabledWhen: {
+                  question: "include_founder_voice",
+                  value: "Yes",
+                },
+                requiredWhen: {
+                  question: "include_founder_voice",
+                  value: "Yes",
+                },
                 max: 250,
               },
             },
@@ -434,8 +442,16 @@ export const personaSchemaV1 = {
               name: "founder_role",
               fieldType: PersonaFieldType.single_dropdown,
               label: "Founder Role",
-              isRequired: true,
+              isRequired: false,
               fieldConfig: {
+                enabledWhen: {
+                  question: "include_founder_voice",
+                  value: "Yes",
+                },
+                requiredWhen: {
+                  question: "include_founder_voice",
+                  value: "Yes",
+                },
                 options: [
                   "Founder",
                   "CEO",
@@ -455,6 +471,10 @@ export const personaSchemaV1 = {
               label: "Appears in content",
               isRequired: false,
               fieldConfig: {
+                enabledWhen: {
+                  question: "include_founder_voice",
+                  value: "Yes",
+                },
                 options: [
                   "Always",
                   "Often",
@@ -470,6 +490,10 @@ export const personaSchemaV1 = {
               label: "Founder Tone Style",
               isRequired: false,
               fieldConfig: {
+                enabledWhen: {
+                  question: "include_founder_voice",
+                  value: "Yes",
+                },
                 options: [
                   "Same as brand voice",
                   "More personal / raw",
@@ -485,6 +509,10 @@ export const personaSchemaV1 = {
               label: "Founder Bio",
               isRequired: false,
               fieldConfig: {
+                enabledWhen: {
+                  question: "include_founder_voice",
+                  value: "Yes",
+                },
                 max: 500,
               },
             },
@@ -494,6 +522,10 @@ export const personaSchemaV1 = {
               label: "Founder Photo Library",
               isRequired: false,
               fieldConfig: {
+                enabledWhen: {
+                  question: "include_founder_voice",
+                  value: "Yes",
+                },
                 max: 5,
                 sizeLimit: 10485760,
                 allowedFileTypes: [
@@ -1229,12 +1261,10 @@ export const personaSchemaV1 = {
           personaQuestions: [
             {
               name: "content_scheduling_preference",
-              fieldType: PersonaFieldType.group_radio,
+              fieldType: PersonaFieldType.switch_group,
               label: "How would you like content scheduled?",
               isRequired: true,
               fieldConfig: {
-                max: null,
-                min: null,
                 options: [
                   {
                     value: "automatic",
@@ -1251,6 +1281,126 @@ export const personaSchemaV1 = {
                 ],
               },
             },
+            {
+              name: "posting_days",
+              fieldType: PersonaFieldType.group_radio,
+              label: "Posting Days",
+              isRequired: false,
+              fieldConfig: {
+                enabledWhen: {
+                  question: "content_scheduling_preference",
+                  value: "manual",
+                },
+                requiredWhen: {
+                  question: "content_scheduling_preference",
+                  value: "manual",
+                },
+                options: [
+                  { value: "daily", label: "Daily" },
+                  { value: "weekdays", label: "Weekdays Only" },
+                  { value: "weekends", label: "Weekends Only" },
+                  { value: "custom", label: "Custom Days" },
+                ],
+              },
+            },
+            {
+              name: "custom_posting_days",
+              fieldType: PersonaFieldType.multi_radio,
+              label: "Custom Days",
+              isRequired: false,
+              fieldConfig: {
+                enabledWhen: {
+                  question: "posting_days",
+                  value: "custom",
+                },
+                requiredWhen: {
+                  question: "posting_days",
+                  value: "custom",
+                },
+                min: 1,
+                options: [
+                  "Mon",
+                  "Tue",
+                  "Wed",
+                  "Thu",
+                  "Fri",
+                  "Sat",
+                  "Sun",
+                ],
+              },
+            },
+            {
+              name: "preferred_posting_window",
+              fieldType: PersonaFieldType.group_radio,
+              label: "Preferred Posting Window",
+              isRequired: false,
+              fieldConfig: {
+                enabledWhen: {
+                  question: "content_scheduling_preference",
+                  value: "manual",
+                },
+                requiredWhen: {
+                  question: "content_scheduling_preference",
+                  value: "manual",
+                },
+                options: [
+                  {
+                    value: "morning",
+                    label: "Morning",
+                    subtitle: "6-10 AM",
+                    selectionNote:
+                      "We'll prioritize posting between 6:00 AM - 10:00 AM in your time zone.",
+                  },
+                  {
+                    value: "midday",
+                    label: "Midday",
+                    subtitle: "10 AM-2 PM",
+                    selectionNote:
+                      "We'll prioritize posting between 10:00 AM - 2:00 PM in your time zone.",
+                  },
+                  {
+                    value: "afternoon",
+                    label: "Afternoon",
+                    subtitle: "2-6 PM",
+                    selectionNote:
+                      "We'll prioritize posting between 2:00 PM - 6:00 PM in your time zone.",
+                  },
+                  {
+                    value: "evening",
+                    label: "Evening",
+                    subtitle: "6-10 PM",
+                    selectionNote:
+                      "We'll prioritize posting between 6:00 PM - 10:00 PM in your time zone.",
+                  },
+                  {
+                    value: "auto",
+                    label: "Let BUZZZED decide",
+                  },
+                ],
+              },
+            },
+            {
+              name: "posting_timezone",
+              fieldType: PersonaFieldType.single_dropdown,
+              label: "Time Zone",
+              isRequired: true,
+              fieldConfig: {
+                helperText:
+                  "All times will be scheduled according to this time zone.",
+                options: [
+                  { value: "Europe/London", title: "United Kingdom (GMT)" },
+                  { value: "Europe/Paris", title: "Central Europe (CET)" },
+                  { value: "America/New_York", title: "Eastern Time (US)" },
+                  { value: "America/Chicago", title: "Central Time (US)" },
+                  { value: "America/Denver", title: "Mountain Time (US)" },
+                  { value: "America/Los_Angeles", title: "Pacific Time (US)" },
+                  { value: "Asia/Dubai", title: "Gulf Standard Time" },
+                  { value: "Asia/Kolkata", title: "India Standard Time" },
+                  { value: "Asia/Singapore", title: "Singapore Time" },
+                  { value: "Australia/Sydney", title: "Australian Eastern Time" },
+                ],
+              },
+            },
           ]
         },
         {
@@ -1262,7 +1412,56 @@ export const personaSchemaV1 = {
           sideInfo: "",
           sortOrder: 3,
           personaQuestions: [
-
+            {
+              name: "content_formats",
+              fieldType: PersonaFieldType.content_formats,
+              label: "Content Formats",
+              isRequired: false,
+              fieldConfig: {
+                options: [
+                  {
+                    slug: "carousel",
+                    title: "Carousel",
+                    description: "Multi-slide content perfect for education, tips, and storytelling.",
+                  },
+                  {
+                    slug: "short-form-video",
+                    title: "Short-form Video",
+                    description: "Reels, Shorts, or TikToks to grab attention and drive engagement.",
+                  },
+                  {
+                    slug: "static-image",
+                    title: "Static Image",
+                    description: "Eye-catching single image posts with powerful captions.",
+                  },
+                  {
+                    slug: "story",
+                    title: "Story",
+                    description: "Short, everyday content perfect for engagement and updates.",
+                  },
+                  {
+                    slug: "long-form-video",
+                    title: "Long-form Video",
+                    description: "In-depth videos for YouTube, webinars, or detailed explanations.",
+                  },
+                  {
+                    slug: "blog-post",
+                    title: "Blog Post",
+                    description: "SEO-friendly articles that build authority and drive traffic.",
+                  },
+                  {
+                    slug: "newsletter-email",
+                    title: "Newsletter Email",
+                    description: "Nurture your audience with valuable updates and insights.",
+                  },
+                  {
+                    slug: "poll",
+                    title: "Poll",
+                    description: "Interactive polls to boost engagement and gather insights.",
+                  },
+                ]
+              }
+            }
           ]
         }
       ],

@@ -31,6 +31,9 @@ export const PERSONA_FIELD_TYPE_META: {
   [PersonaFieldType.file_upload_multiple]: { responseShape: 'array' },
   [PersonaFieldType.range_slider]: { responseShape: 'array' },
   [PersonaFieldType.multi_platform_selector]: { responseShape: 'array' },
+  [PersonaFieldType.switch_group]: { responseShape: 'string' },
+  [PersonaFieldType.group_radio]: { responseShape: 'string' },
+  [PersonaFieldType.content_formats]: { responseShape: 'array' },
 };
 
 const PERSONA_FIELD_TYPE_VALUES = new Set<string>(

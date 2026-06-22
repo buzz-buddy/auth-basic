@@ -48,6 +48,10 @@ export class PersonaResponseValidator {
     [PersonaFieldType.range_slider]: (q, v) => this.validateRangeSlider(q, v),
     [PersonaFieldType.multi_platform_selector]: (q, v) =>
       this.validateMultiPlatformSelector(q, v),
+    [PersonaFieldType.switch_group]: (q, v) => this.validateSingleOption(q, v),
+    [PersonaFieldType.group_radio]: (q, v) => this.validateSingleOption(q, v),
+    [PersonaFieldType.content_formats]: (q, v) =>
+      this.validateContentFormats(q, v),
   };
 
   async validate(
@@ -566,6 +570,30 @@ export class PersonaResponseValidator {
     }
 
     return null;
+  }
+
+  private validateContentFormats(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    if (!Array.isArray(userResponse)) {
+      return 'Must be an array';
+    }
+    if (!userResponse.every((item) => typeof item === 'string')) {
+      return 'All selections must be strings';
+    }
+
+    const config = flattenFieldConfig(question.fieldConfig);
+    const allowed = this.bannerSelectorSlugs(question.fieldConfig);
+    if (allowed.length === 0) {
+      return 'Question has no options configured';
+    }
+
+    return this.validateStringSelectionCount(
+      userResponse as string[],
+      allowed,
+      config,
+    );
   }
 
   private validateMultiRadio(question: PersonaQuestion, userResponse: unknown) {

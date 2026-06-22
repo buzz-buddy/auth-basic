@@ -55,6 +55,9 @@ enum PersonaFieldType {
   file_upload_multiple
   range_slider
   multi_platform_selector
+  switch_group
+  group_radio
+  content_formats
 }
 
 model User {
