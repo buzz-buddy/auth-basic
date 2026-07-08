@@ -1,0 +1,66 @@
+# Production: Postgres + API image from Docker Hub (no local build).
+# CI/CD builds and pushes the image; the server only pulls and runs it.
+#
+# Requires nginx-proxy stack running separately (nginx-proxy/docker-compose.yml).
+# Set VIRTUAL_HOST, LETSENCRYPT_HOST, and LETSENCRYPT_EMAIL in .env — see .env.docker.example.
+#
+# Usage:
+#   cp .env.docker.example .env
+#   docker compose -f docker-compose.prod.yml pull api
+#   docker compose -f docker-compose.prod.yml up -d
+
+networks:
+  proxy:
+    external: true
+    name: nginx-proxy
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-auth_basic}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-auth_basic}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    image: ${DOCKER_IMAGE:?DOCKER_IMAGE is required — e.g. youruser/auth-basic:latest}
+    pull_policy: always
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+      - proxy
+    expose:
+      - "3000"
+    ports:
+      - "127.0.0.1:${PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-auth_basic}?schema=public}
+      NODE_ENV: production
+      RUN_MIGRATIONS: "true"
+      VIRTUAL_HOST: ${VIRTUAL_HOST:?VIRTUAL_HOST is required — e.g. api.yourdomain.com}
+      VIRTUAL_PORT: ${VIRTUAL_PORT:-3000}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST:?LETSENCRYPT_HOST is required — e.g. api.yourdomain.com}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is required}
+    env_file:
+      - path: .env
+        required: true
+
+volumes:
+  pgdata:

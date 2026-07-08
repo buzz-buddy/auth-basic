@@ -1,0 +1,52 @@
+ nginx-proxy + acme-companion — automatic reverse proxy and Let's Encrypt SSL.
+# Full VPS install guide: README.md in this folder.
+#
+# Setup: docker compose up -d
+#
+# App containers (docker-compose.prod.yml) join the nginx-proxy network and set
+# VIRTUAL_HOST / LETSENCRYPT_* in their own .env — no config needed here.
+
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:alpine
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      TRUST_DOWNSTREAM_PROXY: "true"
+      ENABLE_IPV6: "false"
+    volumes:
+      - certs:/etc/nginx/certs:ro
+      - html:/usr/share/nginx/html
+      - ./vhost.d:/etc/nginx/vhost.d
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - proxy
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    restart: unless-stopped
+    depends_on:
+      - nginx-proxy
+    environment:
+      NGINX_PROXY_CONTAINER: nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - html:/usr/share/nginx/html
+      - ./vhost.d:/etc/nginx/vhost.d
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/etc/acme.sh
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: nginx-proxy
+
+volumes:
+  certs:
+  html:
+  acme:
