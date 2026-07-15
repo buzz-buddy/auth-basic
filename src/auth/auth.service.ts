@@ -9,7 +9,7 @@ import {
 } from '../common/exceptions/field-http.exception';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { UserStatus } from '@prisma/client';
+import { OAuthProvider, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { createHash, randomBytes } from 'crypto';
 import { Role } from '../common/enums/role.enum';
@@ -26,6 +26,8 @@ import { RegisterDto } from './dto/register.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { GoogleSignInDto } from './dto/google-sign-in.dto';
+import { GoogleAuthService } from './google-auth.service';
 
 export type AuthTokens = {
   accessToken: string;
@@ -43,6 +45,7 @@ export class AuthService {
     private prisma: PrismaService,
     private mailService: MailService,
     private workspacesService: WorkspacesService,
+    private googleAuthService: GoogleAuthService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -191,7 +194,7 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.usersService.findByEmail(dto.email);
-    if (!user) {
+    if (!user || !user.password) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -205,6 +208,114 @@ export class AuthService {
     await this.usersService.updateLastLogin(user.id);
 
     return this.issueTokens(user.id, user.email, user.role as Role);
+  }
+
+  async signInWithGoogle(dto: GoogleSignInDto) {
+    const googleUser = await this.googleAuthService.verifyIdToken(dto.idToken);
+
+    const existingOAuth = await this.prisma.oAuthAccount.findUnique({
+      where: {
+        provider_providerId: {
+          provider: OAuthProvider.GOOGLE,
+          providerId: googleUser.sub,
+        },
+      },
+      include: { user: true },
+    });
+
+    if (existingOAuth) {
+      return this.completeGoogleSignIn(existingOAuth.user);
+    }
+
+    const existingUser = await this.usersService.findByEmail(googleUser.email);
+
+    if (existingUser) {
+      const user = await this.prisma.$transaction(async (tx) => {
+        await tx.oAuthAccount.create({
+          data: {
+            provider: OAuthProvider.GOOGLE,
+            providerId: googleUser.sub,
+            userId: existingUser.id,
+          },
+        });
+
+        if (!existingUser.emailVerified) {
+          return tx.user.update({
+            where: { id: existingUser.id },
+            data: {
+              emailVerified: true,
+              emailVerifiedAt: new Date(),
+              status: UserStatus.ACTIVE,
+            },
+            select: userPublicSelect,
+          });
+        }
+
+        return tx.user.findUniqueOrThrow({
+          where: { id: existingUser.id },
+          select: userPublicSelect,
+        });
+      });
+
+      return this.completeGoogleSignIn(user);
+    }
+
+    const user = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: {
+          email: googleUser.email,
+          role: Role.USER,
+          firstName: googleUser.firstName,
+          lastName: googleUser.lastName,
+          displayName: googleUser.displayName,
+          status: UserStatus.ACTIVE,
+          emailVerified: true,
+          emailVerifiedAt: new Date(),
+        },
+        select: userPublicSelect,
+      });
+
+      await tx.oAuthAccount.create({
+        data: {
+          provider: OAuthProvider.GOOGLE,
+          providerId: googleUser.sub,
+          userId: created.id,
+        },
+      });
+
+      await this.workspacesService.createDefaultForUser(
+        created.id,
+        tx,
+        created.displayName ?? created.email.split('@')[0],
+      );
+
+      return created;
+    });
+
+    return this.completeGoogleSignIn(user);
+  }
+
+  private async completeGoogleSignIn(user: {
+    id: string;
+    email: string;
+    role: string;
+    status: UserStatus;
+  }) {
+    this.assertAccountCanAuthenticate(user);
+    await this.usersService.updateLastLogin(user.id);
+
+    const tokens = await this.issueTokens(
+      user.id,
+      user.email,
+      user.role as Role,
+    );
+
+    const publicUser = await this.usersService.findById(user.id);
+
+    return {
+      user: publicUser,
+      ...tokens,
+    };
   }
 
   async refresh(refreshToken: string) {

@@ -17,6 +17,10 @@ enum UserStatus {
   PENDING_VERIFICATION
 }
 
+enum OAuthProvider {
+  GOOGLE
+}
+
 enum WorkspaceRole {
   OWNER
   MEMBER
@@ -63,7 +67,7 @@ enum PersonaFieldType {
 model User {
   id                String     @id @default(cuid())
   email             String     @unique
-  password          String
+  password          String?
   role              Role       @default(USER)
   firstName         String?
   lastName          String?
@@ -81,7 +85,20 @@ model User {
   refreshTokens           RefreshToken[]
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
+  oauthAccounts           OAuthAccount[]
   workspaceMemberships    WorkspaceMember[]
+}
+
+model OAuthAccount {
+  id         String        @id @default(cuid())
+  provider   OAuthProvider
+  providerId String
+  userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime      @default(now())
+
+  @@unique([provider, providerId])
+  @@index([userId])
 }
 
 model RefreshToken {

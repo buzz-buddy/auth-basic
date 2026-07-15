@@ -7,6 +7,7 @@ import { MailModule } from '../mail/mail.module';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { GoogleAuthService } from './google-auth.service';
 import { RefreshTokenCookieService } from './refresh-token-cookie.service';
 import { VerifiedEmailGuard } from './guards/verified-email.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -29,7 +30,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, RefreshTokenCookieService, JwtStrategy, VerifiedEmailGuard],
+  providers: [AuthService, GoogleAuthService, RefreshTokenCookieService, JwtStrategy, VerifiedEmailGuard],
   exports: [AuthService, VerifiedEmailGuard],
 })
 export class AuthModule {}

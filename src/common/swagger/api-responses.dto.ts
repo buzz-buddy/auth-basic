@@ -93,6 +93,11 @@ export class UserPublicDto {
   updatedAt: string;
 }
 
+export class GoogleSignInResponseDto extends AccessTokenResponseDto {
+  @ApiProperty({ type: UserPublicDto })
+  user: UserPublicDto;
+}
+
 export class RegisterResponseDto extends AccessTokenResponseDto {
   @ApiProperty({ example: 'Registration successful. Check your email for a verification link.' })
   message: string;

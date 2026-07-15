@@ -17,6 +17,7 @@ import {
 import type { Request, Response } from 'express';
 import {
   AccessTokenResponseDto,
+  GoogleSignInResponseDto,
   LogoutResponseDto,
   MessageResponseDto,
   RegisterResponseDto,
@@ -31,6 +32,7 @@ import { RegisterDto } from './dto/register.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { GoogleSignInDto } from './dto/google-sign-in.dto';
 import { RefreshTokenCookieService } from './refresh-token-cookie.service';
 
 @ApiTags('Authentication')
@@ -145,6 +147,43 @@ export class AuthController {
     const tokens = await this.authService.login(dto);
     this.refreshCookie.set(res, tokens.refreshToken);
     return { accessToken: tokens.accessToken };
+  }
+
+  @Public()
+  @Post('google')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Sign in with Google',
+    description:
+      'Verifies a Google ID token from the frontend popup, then creates or logs in the user. Returns `accessToken` and `user`, and sets the refresh token httpOnly cookie.',
+  })
+  @ApiCookieAuth('refresh-cookie')
+  @ApiResponse({ status: 200, type: GoogleSignInResponseDto })
+  @ApiResponse({ status: 400, type: ValidationErrorResponseDto })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or unverified Google ID token',
+    type: UnauthorizedResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Account suspended',
+    schema: {
+      example: {
+        statusCode: 403,
+        message: 'Account suspended',
+        error: 'Forbidden',
+      },
+    },
+  })
+  async signInWithGoogle(
+    @Body() dto: GoogleSignInDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.signInWithGoogle(dto);
+    this.refreshCookie.set(res, result.refreshToken);
+    const { refreshToken: _refresh, ...body } = result;
+    return body;
   }
 
   @Public()
