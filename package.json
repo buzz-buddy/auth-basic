@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "build:seed": "tsc -p tsconfig.seed.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -28,7 +29,9 @@
     "docker:prod:down": "docker compose -f docker-compose.prod.yml down",
     "docker:prod:pull": "docker compose -f docker-compose.prod.yml pull api",
     "docker:migrate": "docker compose -f docker-compose.dev.yml run --rm api npx prisma migrate deploy",
-    "docker:seed": "docker compose -f docker-compose.dev.yml run --rm api npm run prisma:seed"
+    "docker:seed": "docker compose -f docker-compose.dev.yml run --rm api npm run prisma:seed",
+    "docker:prod:seed": "docker build -f Dockerfile.prod --target seed -t auth-basic-seed:local . && docker compose -f docker-compose.prod.yml --profile seed run --rm seed",
+    "docker:prod:seed:pull": "docker compose -f docker-compose.prod.yml pull seed && docker compose -f docker-compose.prod.yml --profile seed run --rm seed"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1054.0",
@@ -48,6 +51,7 @@
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
+    "google-auth-library": "^10.9.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.21.0",
