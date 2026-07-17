@@ -67,6 +67,10 @@ export function extensionForMime(mimeType: string): string | null {
     'image/jpeg': 'jpg',
     'image/png': 'png',
     'image/webp': 'webp',
+    'image/svg+xml': 'svg',
+    'application/pdf': 'pdf',
+    'application/zip': 'zip',
+    'application/x-zip-compressed': 'zip',
   };
   return map[mimeType] ?? null;
 }

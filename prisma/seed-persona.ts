@@ -51,6 +51,7 @@ export async function seedPersonaSchema(prisma: PrismaClient) {
           sideTitle: sub.sideTitle,
           description: sub.description,
           sideInfo: sub.sideInfo,
+          sidePanelShortInfo: sub.sidePanelShortInfo,
           sortOrder: sub.sortOrder,
         },
         update: {
@@ -59,6 +60,7 @@ export async function seedPersonaSchema(prisma: PrismaClient) {
           sideTitle: sub.sideTitle,
           description: sub.description,
           sideInfo: sub.sideInfo,
+          sidePanelShortInfo: sub.sidePanelShortInfo,
           sortOrder: sub.sortOrder,
         },
       });

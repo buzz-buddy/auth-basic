@@ -62,6 +62,10 @@ enum PersonaFieldType {
   switch_group
   group_radio
   content_formats
+  color_palette
+  font_select
+  visual_mapper
+  icon_choice_cards
 }
 
 model User {
@@ -194,6 +198,7 @@ model PersonaSubComponent {
   sideTitle          String?
   description        String?
   sideInfo           String?           @db.Text
+  sidePanelShortInfo String?
   sortOrder          Int
   personaQuestions   PersonaQuestion[]
   personaComponent   PersonaComponent  @relation(fields: [personaComponentId], references: [id], onDelete: Cascade)
@@ -230,4 +235,20 @@ model WorkspaceQuestionResponse {
 
   @@unique([workspaceId, personaQuestionId])
   @@index([workspaceId])
+}
+
+model Font {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  family             String   @unique
+  category           String
+  tags               String[]
+  suitableForDisplay Boolean  @default(true)
+  suitableForBody    Boolean  @default(true)
+  sortOrder          Int      @default(0)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
 }

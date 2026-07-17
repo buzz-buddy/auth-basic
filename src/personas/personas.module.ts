@@ -1,4 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
+import { FontsModule } from '../fonts/fonts.module';
 import { StorageModule } from '../storage/storage.module';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { PersonasController } from './personas.controller';
@@ -8,7 +9,7 @@ import { PersonaResponseValidator } from './persona-response-validator';
 import { PersonaSchemaService } from './persona-schema.service';
 
 @Module({
-  imports: [forwardRef(() => WorkspacesModule), StorageModule],
+  imports: [forwardRef(() => WorkspacesModule), StorageModule, FontsModule],
   controllers: [PersonasController],
   providers: [
     PersonaSchemaService,

@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
+import { FontsModule } from './fonts/fonts.module';
 import { PersonasModule } from './personas/personas.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
@@ -22,6 +23,7 @@ import { UsersModule } from './users/users.module';
     AdminModule,
     WorkspacesModule,
     PersonasModule,
+    FontsModule,
   ],
   controllers: [AppController],
   providers: [

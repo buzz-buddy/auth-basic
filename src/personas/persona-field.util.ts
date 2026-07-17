@@ -5,6 +5,7 @@ export {
   defaultResponseValue,
   isArrayFieldType,
   isNumericFieldType,
+  isObjectFieldType,
   isPersonaFieldType,
   PERSONA_FIELD_TYPE_META,
   responseTypeForFieldType,

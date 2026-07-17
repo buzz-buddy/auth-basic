@@ -4,6 +4,7 @@ import { PrismaClient, Role, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { Pool } from 'pg';
 import { seedPersonaSchema } from './seed-persona';
+import { seedFonts } from './seed-fonts';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -18,6 +19,7 @@ async function main() {
 
   try {
     await seedPersonaSchema(prisma);
+    await seedFonts(prisma);
 
     const email = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim();
     const password = process.env.BOOTSTRAP_ADMIN_PASSWORD;

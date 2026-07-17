@@ -297,6 +297,7 @@ export class PersonaSchemaService {
       sideTitle: subComponent.sideTitle,
       description: subComponent.description,
       sideInfo: subComponent.sideInfo,
+      sidePanelShortInfo: subComponent.sidePanelShortInfo,
       sortOrder: subComponent.sortOrder,
       personaQuestions,
     };

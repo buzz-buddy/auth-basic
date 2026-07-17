@@ -49,6 +49,9 @@ export class AdminPersonaService {
         ...(dto.sideTitle !== undefined ? { sideTitle: dto.sideTitle } : {}),
         ...(dto.description !== undefined ? { description: dto.description } : {}),
         ...(dto.sideInfo !== undefined ? { sideInfo: dto.sideInfo } : {}),
+        ...(dto.sidePanelShortInfo !== undefined
+          ? { sidePanelShortInfo: dto.sidePanelShortInfo }
+          : {}),
         ...(dto.sortOrder !== undefined ? { sortOrder: dto.sortOrder } : {}),
       },
     });

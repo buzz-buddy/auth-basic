@@ -26,6 +26,11 @@ export class UpdatePersonaSubComponentDto {
   sideInfo?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  sidePanelShortInfo?: string;
+
+  @IsOptional()
   @IsInt()
   sortOrder?: number;
 }

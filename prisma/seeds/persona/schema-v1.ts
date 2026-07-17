@@ -18,6 +18,7 @@ export const personaSchemaV1 = {
           sideTitle: "Here's what BUZZZED found",
           description: "We analyzed your website and pre-filled your project details. Review and edit anything before continuing.",
           sideInfo: "",
+          sidePanelShortInfo: "Pre-filled from your website — just verify and continue.",
           sortOrder: 1,
           personaQuestions: [
             {
@@ -27,6 +28,7 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 max: 250,
+                placeholder: "BUZZZED",
               },
             },
             {
@@ -123,6 +125,7 @@ export const personaSchemaV1 = {
           sideTitle: "Here's what you do",
           description: "We drafted your core offer and messaging. Review and make edits if needed.",
           sideInfo: "",
+          sidePanelShortInfo: "A sharp one-liner is the foundation of all your content.",
           sortOrder: 2,
           personaQuestions: [
             {
@@ -132,6 +135,7 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 max: 500,
+                placeholder: "We help brands create, design, and publish content faster with AI.",
               },
             },
             {
@@ -181,6 +185,7 @@ export const personaSchemaV1 = {
           sideTitle: "Here's how your brand is positioned",
           description: "We drafted your positioning. Review and edit anything below.",
           sideInfo: "",
+          sidePanelShortInfo: "Strong positioning creates content that attracts the right audience.",
           sortOrder: 3,
           personaQuestions: [
             {
@@ -190,6 +195,7 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 max: 500,
+                placeholder: "Marketing teams, brands, agencies, and content creators looking to create content faster with AI.",
               },
             },
             {
@@ -199,6 +205,7 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 max: 250,
+                placeholder: "We help brands create better content...",
               },
             },
             {
@@ -208,6 +215,7 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 max: 250,
+                placeholder: "We help brands create better content...",
               },
             },
             {
@@ -217,6 +225,7 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 max: 250,
+                placeholder: "Helping brands simplify content creation from strategy to publishing.",
               },
             },
             {
@@ -226,6 +235,7 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 max: 500,
+                placeholder: "Marketing teams, brands, agencies, and content creators looking to create content faster with AI.",
               },
             },
             {
@@ -235,6 +245,7 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 max: 500,
+                placeholder: "Marketing teams, brands, agencies, and content creators looking to create content faster with AI.",
               },
             },
             {
@@ -265,6 +276,7 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 max: 250,
+                placeholder: "Helping brands simplify content creation from strategy to publishing.",
               },
             },
           ],
@@ -276,6 +288,7 @@ export const personaSchemaV1 = {
           sideTitle: "Brand Personality",
           description: "Define your brand archetype, tone, and personality dimensions.",
           sideInfo: "",
+          sidePanelShortInfo: "Your archetype guides every content decision the AI makes.",
           sortOrder: 4,
           personaQuestions: [
             {
@@ -407,6 +420,7 @@ export const personaSchemaV1 = {
           sideTitle: "Founder Voice",
           description: "Does a founder or CEO have a personal voice that should appear in content?",
           sideInfo: "",
+          sidePanelShortInfo: "Founder-led content drives 3× higher trust signals.",
           sortOrder: 5,
           personaQuestions: [
             {
@@ -436,6 +450,7 @@ export const personaSchemaV1 = {
                   value: "Yes",
                 },
                 max: 250,
+                placeholder: "Full Name",
               },
             },
             {
@@ -514,6 +529,7 @@ export const personaSchemaV1 = {
                   value: "Yes",
                 },
                 max: 500,
+                placeholder: "One paragraph about the founder's background, expertise, and story.",
               },
             },
             {
@@ -552,6 +568,7 @@ export const personaSchemaV1 = {
           sideTitle: "Audience Persona",
           description: "Build a precise profile of who you're creating content for.",
           sideInfo: "",
+          sidePanelShortInfo: "Be specific — the more precise, the better AI performs.",
           sortOrder: 1,
           personaQuestions: [
             {
@@ -561,6 +578,7 @@ export const personaSchemaV1 = {
               isRequired: true,
               fieldConfig: {
                 max: 250,
+                placeholder: "Persona name e.g. 'Marketing Mia'",
               },
             },
             {
@@ -746,6 +764,7 @@ export const personaSchemaV1 = {
           sideTitle: "Who Appears in Content?",
           description: "These choices shape every visual BUZZZED generates for you.",
           sideInfo: "",
+          sidePanelShortInfo: "Representation choices shape every visual AI generates.",
           sortOrder: 2,
           personaQuestions: [
             {
@@ -775,6 +794,7 @@ export const personaSchemaV1 = {
           sideTitle: "Goals",
           description: "Set your primary business objective and time horizon.",
           sideInfo: "",
+          sidePanelShortInfo: "Clear goals help AI optimize every post for the right outcome.",
           sortOrder: 3,
           personaQuestions: [
             {
@@ -833,6 +853,7 @@ export const personaSchemaV1 = {
           sideTitle: "Competitive Context",
           description: "Optional — AI analyzes competitor public content to sharpen your differentiation.",
           sideInfo: "",
+          sidePanelShortInfo: "Optional — but competitor analysis sharpens differentiation significantly.",
           sortOrder: 4,
           personaQuestions: [
             {
@@ -870,6 +891,7 @@ export const personaSchemaV1 = {
           sideTitle: "Funnel Stage Content Mix",
           description: "How much of your content should target each stage of the funnel? Sliders are linked — they always sum to 100%.",
           sideInfo: "",
+          sidePanelShortInfo: "A 50/30/20 TOFU/MOFU/BOFU split is the most common high-performer.",
           sortOrder: 5,
           personaQuestions: [
             {
@@ -907,6 +929,7 @@ export const personaSchemaV1 = {
           sideTitle: "Content Pillars",
           description: "Pick 3-5 pillars, then set the weighting. AI generates content across all of them proportionally.",
           sideInfo: "",
+          sidePanelShortInfo: "Pick 3–5 pillars. AI generates content across all of them weighted by your mix.",
           sortOrder: 1,
           personaQuestions: [
             {
@@ -972,6 +995,7 @@ export const personaSchemaV1 = {
           sideTitle: "Primary Content Mode",
           description: "This sets the strategic voice across all your posts.",
           sideInfo: "",
+          sidePanelShortInfo: "Content mode sets the strategic voice across all your posts.",
           sortOrder: 2,
           personaQuestions: [
             {
@@ -1065,6 +1089,7 @@ export const personaSchemaV1 = {
           sideTitle: "Compliance & Guardrails",
           description: "Set once — they apply to every piece of content BUZZZED creates.",
           sideInfo: "",
+          sidePanelShortInfo: "Guardrails protect your brand — set them once, they apply everywhere.",
           sortOrder: 3,
           personaQuestions: [
             {
@@ -1138,6 +1163,7 @@ export const personaSchemaV1 = {
           sideTitle: "Key Dates",
           description: "Optional — key dates unlock launch-campaign templates automatically.",
           sideInfo: "",
+          sidePanelShortInfo: "Key dates unlock launch-campaign templates automatically.",
           sortOrder: 4,
           personaQuestions: [
             {
@@ -1151,7 +1177,7 @@ export const personaSchemaV1 = {
                 nameMax: 250,
                 genericLabel: "Event",
                 textPlaceholder: "Add short description about the event.",
-
+                helperText: "Used to generate content around key dates",
               },
             },
             {
@@ -1165,6 +1191,7 @@ export const personaSchemaV1 = {
                 nameMax: 250,
                 genericLabel: "Campaign",
                 textPlaceholder: "Add short description about the campaign.",
+                helperText: "Used to generate content around key dates",
               },
             },
           ],
@@ -1184,6 +1211,7 @@ export const personaSchemaV1 = {
           sideTitle: "Where will you show up?",
           description: "Toggle platforms on. AI tailors format and tone for each one.",
           sideInfo: "",
+          sidePanelShortInfo: "Start with 2–3 platforms and expand as you grow.",
           sortOrder: 1,
           personaQuestions: [
             {
@@ -1257,6 +1285,7 @@ export const personaSchemaV1 = {
           sideTitle: "Schedule Preferences",
           description: "When will you post? AI adapts timing per platform automatically.         ",
           sideInfo: "",
+          sidePanelShortInfo: "Consistent posting times increase algorithmic reach by up to 40%.",
           sortOrder: 2,
           personaQuestions: [
             {
@@ -1410,6 +1439,7 @@ export const personaSchemaV1 = {
           sideTitle: "Content Formats",
           description: "Select the formats you want BUZZZED to generate.         ",
           sideInfo: "",
+          sidePanelShortInfo: "Carousels drive 3× more profile visits than static images.",
           sortOrder: 3,
           personaQuestions: [
             {
@@ -1473,14 +1503,464 @@ export const personaSchemaV1 = {
       sortOrder: 5,
       personaSubComponents: [
         {
-          slug: "basics",
-          label: "Basics",
-          title: "Here's what BUZZZED found",
-          sideTitle: "Here's what BUZZZED found",
-          description: "We analyzed your website and pre-filled your project details. Review and edit anything before continuing.",
+          slug: "colors",
+          label: "Colors",
+          title: "Brand Colors",
+          sideTitle: "Set your brand colors.",
+          description: "Set your palette. AI applies these across all generated content.",
           sideInfo: "",
+          sidePanelShortInfo: "A 3-color palette keeps content visually cohesive at scale.",
           sortOrder: 1,
-          personaQuestions: [],
+          personaQuestions: [
+            {
+              name: "color_style",
+              fieldType: PersonaFieldType.switch_group,
+              label: "Color Style",
+              isRequired: true,
+              fieldConfig: {
+                options: [
+                  {
+                    value: "solid",
+                    label: "Solid Colors",
+                    description: "Clean and modern look",
+                    isRecommended: true,
+                  },
+                  {
+                    value: "gradient",
+                    label: "Gradient",
+                    description: "Vibrant and dynamic look",
+                    isRecommended: false,
+                  },
+                ],
+              },
+            },
+            {
+              name: "brand_palette",
+              fieldType: PersonaFieldType.color_palette,
+              label: "Brand Palette",
+              isRequired: true,
+              fieldConfig: {
+                suggestedPalettes: [
+                  {
+                    value: "current",
+                    label: "Current Palette",
+                    primary: "#3B2F2F",
+                    secondary: "#F97316",
+                    accent: "#F59E0B",
+                  },
+                  {
+                    value: "high_contrast",
+                    label: "High Contrast",
+                    primary: "#F97316",
+                    secondary: "#F59E0B",
+                    accent: "#3B2F2F",
+                  },
+                  {
+                    value: "modern_minimal",
+                    label: "Modern Minimal",
+                    primary: "#F5E6D3",
+                    secondary: "#F97316",
+                    accent: "#3B2F2F",
+                  },
+                  {
+                    value: "vibrant_social",
+                    label: "Vibrant Social",
+                    primary: "#F97316",
+                    secondary: "#F5E6D3",
+                    accent: "#A8A29E",
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          slug: "typography",
+          label: "Typography",
+          title: "Typography",
+          sideTitle: "Choose your typeface.",
+          description:
+            "Choose your display and body fonts. These appear in every headline AI generates.",
+          sideInfo: "",
+          sidePanelShortInfo: "Typography is 80% of design — choose something that feels like you.",
+          sortOrder: 2,
+          personaQuestions: [
+            {
+              name: "display_font",
+              fieldType: PersonaFieldType.font_select,
+              label: "Display Font",
+              isRequired: true,
+              fieldConfig: {
+                role: "display",
+                footnote:
+                  "Used for headlines, titles, hero text, and key highlights.",
+              },
+            },
+            {
+              name: "body_font",
+              fieldType: PersonaFieldType.font_select,
+              label: "Body Font",
+              isRequired: true,
+              fieldConfig: {
+                role: "body",
+                footnote:
+                  "Used for captions, descriptions, and long-form content.",
+              },
+            },
+          ],
+        },
+        {
+          slug: "visual_style",
+          label: "Visual Style",
+          title: "Build your visual system",
+          sideTitle: "Content formats",
+          description:
+            "Click a content format, then choose a visual style to connect them.",
+          sideInfo: "",
+          sidePanelShortInfo: "Consistent visuals increase brand recall by 80%.",
+          sortOrder: 3,
+          personaQuestions: [
+            {
+              name: "visual_style_mappings",
+              fieldType: PersonaFieldType.visual_mapper,
+              label: "Visual Style",
+              isRequired: true,
+              fieldConfig: {
+                sourceColumnLabel: "Content Format",
+                targetColumnLabel: "Visual Styles",
+                sourceOptions: [
+                  {
+                    id: "static_image",
+                    title: "Static Image",
+                    description: "Single images for posts",
+                    iconAsset: "svgs/vs-static-image.svg",
+                    accentColor: "#EB6442",
+                  },
+                  {
+                    id: "carousel",
+                    title: "Carousel",
+                    description: "Multi-image carousels",
+                    iconAsset: "svgs/vs-carousel.svg",
+                    accentColor: "#9B79FB",
+                  },
+                  {
+                    id: "short_form_video",
+                    title: "Short-form Video",
+                    description: "Reels, Shorts, TikTok",
+                    iconAsset: "svgs/vs-short-form-video.svg",
+                    accentColor: "#F88F51",
+                  },
+                  {
+                    id: "long_form_video",
+                    title: "Long-form Video",
+                    description: "YouTube, webinars, etc.",
+                    iconAsset: "svgs/vs-long-form-video.svg",
+                    accentColor: "#62CFC9",
+                  },
+                  {
+                    id: "story",
+                    title: "Story",
+                    description: "Instagram/Facebook stories",
+                    iconAsset: "svgs/vs-story.svg",
+                    accentColor: "#8870E5",
+                  },
+                  {
+                    id: "newsletter_email",
+                    title: "Newsletter Email",
+                    description: "Email headers & graphics",
+                    iconAsset: "svgs/vs-newsletter-email.svg",
+                    accentColor: "#EB79AC",
+                  },
+                  {
+                    id: "blog_post",
+                    title: "Blog Post",
+                    description: "Blog headers images",
+                    iconAsset: "svgs/vs-blog-post.svg",
+                    accentColor: "#DE836C",
+                  },
+                  {
+                    id: "poll_question",
+                    title: "Poll / Question",
+                    description: "Polls, questions, interactive",
+                    iconAsset: "svgs/vs-poll-question.svg",
+                    accentColor: "#5F98D0",
+                  },
+                ],
+                targetOptions: [
+                  {
+                    id: "minimalist",
+                    title: "Minimalist",
+                    description: "Clean lines, whitespace, restrained color",
+                    thumbnailAsset: "minimalist.png",
+                  },
+                  {
+                    id: "bold_vibrant",
+                    title: "Bold & Vibrant",
+                    description: "High contrast, saturated colors, strong type",
+                    thumbnailAsset: "bold-vibrant.png",
+                  },
+                  {
+                    id: "luxury_premium",
+                    title: "Luxury / Premium",
+                    description: "Dark palettes, gold accents, premium feel",
+                    thumbnailAsset: "luxury-premium.png",
+                  },
+                  {
+                    id: "human_founder_led",
+                    title: "Human / Founder-Led",
+                    description: "Real people, candid moments, warmth",
+                    thumbnailAsset: "human-founder-led.png",
+                  },
+                  {
+                    id: "corporate_clean",
+                    title: "Corporate Clean",
+                    description: "Professional, structured, trust-building",
+                    thumbnailAsset: "corporate-clean.png",
+                  },
+                  {
+                    id: "creative_artistic",
+                    title: "Creative / Artistic",
+                    description: "Expressive, unconventional, design-forward",
+                    thumbnailAsset: "creative-artistic.png",
+                  },
+                  {
+                    id: "dark_moody",
+                    title: "Dark & Moody",
+                    description: "Deep tones, dramatic lighting, cinematic",
+                    thumbnailAsset: "dark-moody.png",
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          slug: "ai_autonomy",
+          label: "AI Autonomy",
+          title: "AI Design Autonomy",
+          sideTitle: "AI design autonomy.",
+          description:
+            "Control how much creative freedom the AI has with your visuals.",
+          sideInfo: "",
+          sidePanelShortInfo:
+            "More freedom = more creative variety. Strict = consistent brand.",
+          sortOrder: 4,
+          personaQuestions: [
+            {
+              name: "photo_treatment_freedom",
+              fieldType: PersonaFieldType.single_dropdown,
+              label: "Photo Treatment Freedom",
+              isRequired: true,
+              fieldConfig: {
+                options: ["strict", "minimal", "balanced", "full_freedom"],
+                levels: [
+                  {
+                    id: "strict",
+                    label: "Strict",
+                    imageSrc:
+                      "/media/onboarding/ai-design-autonomy/cards/strict.png",
+                  },
+                  {
+                    id: "minimal",
+                    label: "Minimal Changes",
+                    imageSrc:
+                      "/media/onboarding/ai-design-autonomy/cards/minimal.png",
+                  },
+                  {
+                    id: "balanced",
+                    label: "Balanced",
+                    imageSrc:
+                      "/media/onboarding/ai-design-autonomy/cards/balanced.png",
+                    recommended: true,
+                  },
+                  {
+                    id: "full_freedom",
+                    label: "Full Freedom",
+                    imageSrc:
+                      "/media/onboarding/ai-design-autonomy/cards/full-freedom.png",
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          slug: "caption_prefs",
+          label: "Caption Prefs",
+          title: "Caption Preferences",
+          sideTitle: "Caption preferences.",
+          description:
+            "Set how your captions look and feel across all platforms.",
+          sideInfo: "",
+          sidePanelShortInfo: "Caption style is one of the most impactful brand consistency signals.",
+          sortOrder: 5,
+          personaQuestions: [
+            {
+              name: "caption_length",
+              fieldType: PersonaFieldType.single_dropdown,
+              label: "Caption Length",
+              isRequired: true,
+              fieldConfig: {
+                options: [
+                  "Short (10 - 15 words)",
+                  "Medium (15 - 30 words)",
+                  "Long (30+ words)",
+                ],
+              },
+            },
+            {
+              name: "cta_style",
+              fieldType: PersonaFieldType.multi_radio,
+              label: "CTA Style",
+              isRequired: true,
+              fieldConfig: {
+                min: 1,
+                max: null,
+                options: [
+                  "Soft (no CTA)",
+                  "Educational",
+                  "Urgency",
+                  'Direct ("buy now")',
+                  "Curiosity",
+                  "Comment-driven",
+                  "DM-driven",
+                ],
+              },
+            },
+            {
+              name: "hashtag_strategy",
+              fieldType: PersonaFieldType.single_dropdown,
+              label: "Hashtag Strategy",
+              isRequired: true,
+              fieldConfig: {
+                options: [
+                  "None",
+                  "Branded only",
+                  "Branded + trending",
+                  "Full mix",
+                ],
+              },
+            },
+            {
+              name: "emoji_density",
+              fieldType: PersonaFieldType.single_dropdown,
+              label: "Emoji Density",
+              isRequired: true,
+              fieldConfig: {
+                options: ["None", "Low", "Medium", "High"],
+              },
+            },
+          ],
+        },
+        {
+          slug: "approval",
+          label: "Approval",
+          title: "Approval Workflow",
+          sideTitle: "Approval workflow.",
+          description: "How should content be approved before publishing?",
+          sideInfo: "",
+          sidePanelShortInfo: "Solo mode publishes immediately after your approval.",
+          sortOrder: 6,
+          personaQuestions: [
+            {
+              name: "approval_mode",
+              fieldType: PersonaFieldType.icon_choice_cards,
+              label: "Approval mode",
+              isRequired: true,
+              fieldConfig: {
+                options: [
+                  {
+                    title: "Solo",
+                    brief: "I review and BUZZZED publishes.",
+                    icon: "solo",
+                    slug: "solo",
+                  },
+                  {
+                    title: "Hold for my approval",
+                    brief: "Nothing gets published until I approve it.",
+                    icon: "hold_for_approval",
+                    slug: "hold_for_approval",
+                  },
+                  {
+                    title: "Send to teammate first",
+                    brief: "A teammate reviews content before it goes live.",
+                    icon: "send_to_teammate_first",
+                    slug: "send_to_teammate_first",
+                  },
+                ],
+              },
+            },
+            {
+              name: "approver_email",
+              fieldType: PersonaFieldType.text,
+              label: "Approver Email",
+              isRequired: false,
+              fieldConfig: {
+                enabledWhen: {
+                  question: "approval_mode",
+                  value: "send_to_teammate_first",
+                },
+                requiredWhen: {
+                  question: "approval_mode",
+                  value: "send_to_teammate_first",
+                },
+                max: 250,
+                placeholder: "teammate@company.com",
+              },
+            },
+            {
+              name: "auto_publish_after_approval",
+              fieldType: PersonaFieldType.switch,
+              label: "Auto-publish after approval?",
+              isRequired: false,
+              fieldConfig: {
+                options: ["true", "false"],
+              },
+            },
+          ],
+        },
+        {
+          slug: "brand_assets",
+          label: "Brand Assets",
+          title: "Brand Assets",
+          sideTitle: "Upload brand assets.",
+          description:
+            "Optional — brand kit upload auto-populates colors and fonts in the next steps.",
+          sideInfo: "",
+          sidePanelShortInfo: "Brand kit upload auto-populates fonts and colors in the next steps.",
+          sortOrder: 7,
+          personaQuestions: [
+            {
+              name: "logo_upload",
+              fieldType: PersonaFieldType.file_upload_multiple,
+              label: "Logo Upload",
+              isRequired: false,
+              fieldConfig: {
+                max: 5,
+                sizeLimit: 10485760,
+                allowedFileTypes: [
+                  "image/png",
+                  "image/jpeg",
+                  "image/svg+xml",
+                ],
+              },
+            },
+            {
+              name: "brand_kit_upload",
+              fieldType: PersonaFieldType.file_upload_multiple,
+              label: "Brand Kit Upload",
+              isRequired: false,
+              fieldConfig: {
+                max: 1,
+                sizeLimit: 26214400,
+                allowedFileTypes: [
+                  "application/pdf",
+                  "application/zip",
+                  "application/x-zip-compressed",
+                ],
+              },
+            },
+          ],
         },
       ],
     },

@@ -15,6 +15,7 @@ export type PersonaSchemaSeedSubComponent = {
   sideTitle?: string;
   description?: string;
   sideInfo?: string;
+  sidePanelShortInfo?: string;
   sortOrder: number;
   personaQuestions?: PersonaSchemaSeedQuestion[];
 };

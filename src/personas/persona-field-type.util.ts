@@ -1,6 +1,6 @@
 import { PersonaFieldType } from '../common/enums/persona-field-type.enum';
 
-export type PersonaResponseShape = 'string' | 'array' | 'number';
+export type PersonaResponseShape = 'string' | 'array' | 'number' | 'object';
 
 /** API-facing name for the JSON shape of `userResponse`. */
 export type PersonaResponseType = PersonaResponseShape;
@@ -34,6 +34,10 @@ export const PERSONA_FIELD_TYPE_META: {
   [PersonaFieldType.switch_group]: { responseShape: 'string' },
   [PersonaFieldType.group_radio]: { responseShape: 'string' },
   [PersonaFieldType.content_formats]: { responseShape: 'array' },
+  [PersonaFieldType.color_palette]: { responseShape: 'object' },
+  [PersonaFieldType.font_select]: { responseShape: 'string' },
+  [PersonaFieldType.visual_mapper]: { responseShape: 'array' },
+  [PersonaFieldType.icon_choice_cards]: { responseShape: 'string' },
 };
 
 const PERSONA_FIELD_TYPE_VALUES = new Set<string>(
@@ -63,6 +67,10 @@ export function isNumericFieldType(fieldType: PersonaFieldType): boolean {
   return PERSONA_FIELD_TYPE_META[fieldType].responseShape === 'number';
 }
 
+export function isObjectFieldType(fieldType: PersonaFieldType): boolean {
+  return PERSONA_FIELD_TYPE_META[fieldType].responseShape === 'object';
+}
+
 export function responseTypeForFieldType(
   fieldType: PersonaFieldType,
 ): PersonaResponseType {
@@ -75,7 +83,7 @@ export function defaultResponseValue(
   if (isArrayFieldType(fieldType)) {
     return [];
   }
-  if (isNumericFieldType(fieldType)) {
+  if (isNumericFieldType(fieldType) || isObjectFieldType(fieldType)) {
     return null;
   }
   return '';

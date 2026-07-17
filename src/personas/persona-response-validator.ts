@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PersonaFieldType, PersonaQuestion, Prisma } from '@prisma/client';
 import { badRequestWithFieldErrors } from '../common/exceptions/field-http.exception';
+import { FontsService } from '../fonts/fonts.service';
 import { StorageService } from '../storage/storage.service';
 import { isPersonaFileKeyForQuestion } from './persona-file.util';
 import { flattenFieldConfig, isArrayFieldType, isEmptyPersonaResponse, isNumericFieldType } from './persona-field.util';
@@ -17,7 +18,10 @@ type FieldValidator = (
 
 @Injectable()
 export class PersonaResponseValidator {
-  constructor(private storageService: StorageService) {}
+  constructor(
+    private storageService: StorageService,
+    private fontsService: FontsService,
+  ) {}
 
   private readonly validators: { [K in PersonaFieldType]: FieldValidator } = {
     [PersonaFieldType.text]: (q, v) => this.validateText(q, v),
@@ -52,6 +56,11 @@ export class PersonaResponseValidator {
     [PersonaFieldType.group_radio]: (q, v) => this.validateSingleOption(q, v),
     [PersonaFieldType.content_formats]: (q, v) =>
       this.validateContentFormats(q, v),
+    [PersonaFieldType.color_palette]: (q, v) => this.validateColorPalette(q, v),
+    [PersonaFieldType.font_select]: (q, v) => this.validateFontSelect(q, v),
+    [PersonaFieldType.visual_mapper]: (q, v) => this.validateVisualMapper(q, v),
+    [PersonaFieldType.icon_choice_cards]: (q, v) =>
+      this.validateIconChoiceCards(q, v),
   };
 
   async validate(
@@ -98,6 +107,12 @@ export class PersonaResponseValidator {
       return (
         Array.isArray(userResponse) &&
         userResponse.some((item) => this.isValidPlatformSelection(item))
+      );
+    }
+    if (question.fieldType === PersonaFieldType.visual_mapper) {
+      return (
+        Array.isArray(userResponse) &&
+        userResponse.some((item) => this.isValidVisualMapping(item))
       );
     }
     if (isArrayFieldType(question.fieldType)) {
@@ -255,6 +270,13 @@ export class PersonaResponseValidator {
       return 'Must be one of the allowed options';
     }
     return null;
+  }
+
+  private validateIconChoiceCards(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    return this.validateBannerSelector(question, userResponse);
   }
 
   private validateBroadSelector(
@@ -596,6 +618,100 @@ export class PersonaResponseValidator {
     );
   }
 
+  private validateColorPalette(
+    _question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    if (
+      userResponse === null ||
+      typeof userResponse !== 'object' ||
+      Array.isArray(userResponse)
+    ) {
+      return 'Must be an object with primary, secondary, and accent colors';
+    }
+
+    const palette = userResponse as Record<string, unknown>;
+    const keys = ['primary', 'secondary', 'accent'] as const;
+    const hexPattern = /^#[0-9A-Fa-f]{6}$/;
+
+    for (const key of keys) {
+      const value = palette[key];
+      if (typeof value !== 'string' || !hexPattern.test(value)) {
+        return `${key} must be a hex color like #RRGGBB`;
+      }
+    }
+
+    return null;
+  }
+
+  private async validateFontSelect(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    if (typeof userResponse !== 'string' || userResponse.trim().length === 0) {
+      return 'Must be a font slug string';
+    }
+
+    const slug = userResponse.trim();
+    const font = await this.fontsService.findActiveBySlug(slug);
+    if (!font) {
+      return 'Must be an active font from the catalog';
+    }
+
+    const { role } = flattenFieldConfig(question.fieldConfig);
+    if (role === 'display' && !font.suitableForDisplay) {
+      return 'Font is not suitable for display use';
+    }
+    if (role === 'body' && !font.suitableForBody) {
+      return 'Font is not suitable for body use';
+    }
+
+    return null;
+  }
+
+  private validateVisualMapper(
+    question: PersonaQuestion,
+    userResponse: unknown,
+  ) {
+    if (!Array.isArray(userResponse)) {
+      return 'Must be an array';
+    }
+
+    const sourceIds = this.visualMapperOptionIds(
+      question.fieldConfig,
+      'sourceOptions',
+    );
+    const targetIds = this.visualMapperOptionIds(
+      question.fieldConfig,
+      'targetOptions',
+    );
+    if (sourceIds.length === 0 || targetIds.length === 0) {
+      return 'Question has no options configured';
+    }
+
+    const seenSourceIds = new Set<string>();
+    for (const item of userResponse) {
+      if (!this.isValidVisualMapping(item)) {
+        return 'Each mapping must have a sourceId and targetId';
+      }
+
+      if (!sourceIds.includes(item.sourceId)) {
+        return 'All sourceId values must be allowed content formats';
+      }
+
+      if (!targetIds.includes(item.targetId)) {
+        return 'All targetId values must be allowed visual styles';
+      }
+
+      if (seenSourceIds.has(item.sourceId)) {
+        return 'Each content format may map to at most one visual style';
+      }
+      seenSourceIds.add(item.sourceId);
+    }
+
+    return null;
+  }
+
   private validateMultiRadio(question: PersonaQuestion, userResponse: unknown) {
     if (!Array.isArray(userResponse)) {
       return 'Must be an array';
@@ -719,6 +835,44 @@ export class PersonaResponseValidator {
       typeof entry.postsPerWeek === 'number' &&
       Number.isFinite(entry.postsPerWeek)
     );
+  }
+
+  private isValidVisualMapping(
+    item: unknown,
+  ): item is { sourceId: string; targetId: string } {
+    if (item === null || typeof item !== 'object' || Array.isArray(item)) {
+      return false;
+    }
+
+    const entry = item as Record<string, unknown>;
+    return (
+      typeof entry.sourceId === 'string' &&
+      entry.sourceId.trim().length > 0 &&
+      typeof entry.targetId === 'string' &&
+      entry.targetId.trim().length > 0
+    );
+  }
+
+  private visualMapperOptionIds(
+    fieldConfig: Prisma.JsonValue | null,
+    key: 'sourceOptions' | 'targetOptions',
+  ): string[] {
+    const config = flattenFieldConfig(fieldConfig);
+    const options = config[key];
+    if (!Array.isArray(options)) {
+      return [];
+    }
+
+    return options.flatMap((item) => {
+      if (item === null || typeof item !== 'object' || Array.isArray(item)) {
+        return [];
+      }
+      const entry = item as Record<string, unknown>;
+      if (typeof entry.id === 'string' && entry.id.trim().length > 0) {
+        return [entry.id];
+      }
+      return [];
+    });
   }
 
   private broadSelectorOptions(
