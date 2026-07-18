@@ -1,4 +1,5 @@
 import { PersonaFieldType } from '@prisma/client';
+import { personaAssetUrl } from './asset-url';
 import { PersonaSchemaSeed } from './persona-schema.types';
 
 export const personaSchemaV1 = {
@@ -1013,6 +1014,14 @@ export const personaSchemaV1 = {
                     isRecommended: false,
                     icon: "🧠",
                     slug: "thought-leadership",
+                    bannerAsset: personaAssetUrl(
+                      "content-mode/banners/thought-leadership-banner.webp",
+                      "content-mode/banners/thought-leadership-banner.webp",
+                    ),
+                    thumbnailAsset: personaAssetUrl(
+                      "content-mode/thumbs/thought-leadership-thumb.webp",
+                      "content-mode/thumbs/thought-leadership-thumb.webp",
+                    ),
                   },
                   {
                     title: "Promotional",
@@ -1022,6 +1031,14 @@ export const personaSchemaV1 = {
                     isRecommended: true,
                     icon: "🛍️",
                     slug: "promotional",
+                    bannerAsset: personaAssetUrl(
+                      "content-mode/banners/promotional-banner.webp",
+                      "content-mode/banners/promotional-banner.webp",
+                    ),
+                    thumbnailAsset: personaAssetUrl(
+                      "content-mode/thumbs/promotional-thumb.webp",
+                      "content-mode/thumbs/promotional-thumb.webp",
+                    ),
                   },
                   {
                     title: "Storytelling",
@@ -1031,6 +1048,14 @@ export const personaSchemaV1 = {
                     isRecommended: false,
                     icon: "🎤",
                     slug: "storytelling",
+                    bannerAsset: personaAssetUrl(
+                      "content-mode/banners/storytelling-banner.webp",
+                      "content-mode/banners/storytelling-banner.webp",
+                    ),
+                    thumbnailAsset: personaAssetUrl(
+                      "content-mode/thumbs/storytelling-thumb.webp",
+                      "content-mode/thumbs/storytelling-thumb.webp",
+                    ),
                   },
                   {
                     title: "Educational Series",
@@ -1040,6 +1065,14 @@ export const personaSchemaV1 = {
                     isRecommended: false,
                     icon: "📚",
                     slug: "educational-series",
+                    bannerAsset: personaAssetUrl(
+                      "content-mode/banners/educational-series-banner.webp",
+                      "content-mode/banners/educational-series-banner.webp",
+                    ),
+                    thumbnailAsset: personaAssetUrl(
+                      "content-mode/thumbs/educational-series-thumb.webp",
+                      "content-mode/thumbs/educational-series-thumb.webp",
+                    ),
                   },
                   {
                     title: "Behind-the-Scenes",
@@ -1049,6 +1082,14 @@ export const personaSchemaV1 = {
                     isRecommended: false,
                     icon: "🎥",
                     slug: "behind-the-scenes",
+                    bannerAsset: personaAssetUrl(
+                      "content-mode/banners/behind-the-scenes-banner.webp",
+                      "content-mode/banners/behind-the-scenes-banner.webp",
+                    ),
+                    thumbnailAsset: personaAssetUrl(
+                      "content-mode/thumbs/behind-the-scenes-thumb.webp",
+                      "content-mode/thumbs/behind-the-scenes-thumb.webp",
+                    ),
                   },
                   {
                     title: "Product Showcase",
@@ -1058,6 +1099,14 @@ export const personaSchemaV1 = {
                     isRecommended: false,
                     icon: "📦",
                     slug: "product-showcase",
+                    bannerAsset: personaAssetUrl(
+                      "content-mode/banners/product-showcase-banner.webp",
+                      "content-mode/banners/product-showcase-banner.webp",
+                    ),
+                    thumbnailAsset: personaAssetUrl(
+                      "content-mode/thumbs/product-showcase-thumb.webp",
+                      "content-mode/thumbs/product-showcase-thumb.webp",
+                    ),
                   },
                   {
                     title: "Community Building",
@@ -1067,6 +1116,14 @@ export const personaSchemaV1 = {
                     isRecommended: false,
                     icon: "🤝",
                     slug: "community-building",
+                    bannerAsset: personaAssetUrl(
+                      "content-mode/banners/community-building-banner.webp",
+                      "content-mode/banners/community-building-banner.webp",
+                    ),
+                    thumbnailAsset: personaAssetUrl(
+                      "content-mode/thumbs/community-building-thumb.webp",
+                      "content-mode/thumbs/community-building-thumb.webp",
+                    ),
                   },
                   {
                     title: "Mixed / Auto",
@@ -1076,7 +1133,15 @@ export const personaSchemaV1 = {
                     isRecommended: false,
                     icon: "🎨",
                     slug: "mixed-auto",
-                  }                
+                    bannerAsset: personaAssetUrl(
+                      "content-mode/banners/mixed-auto-banner.webp",
+                      "content-mode/banners/mixed-auto-banner.webp",
+                    ),
+                    thumbnailAsset: personaAssetUrl(
+                      "content-mode/thumbs/mixed-auto-thumb.webp",
+                      "content-mode/thumbs/mixed-auto-thumb.webp",
+                    ),
+                  },
                 ],
               },
             },
@@ -1633,56 +1698,80 @@ export const personaSchemaV1 = {
                     id: "static_image",
                     title: "Static Image",
                     description: "Single images for posts",
-                    iconAsset: "svgs/vs-static-image.svg",
+                    iconAsset: personaAssetUrl(
+                      "visual-style/svgs/vs-static-image.svg",
+                      "svgs/vs-static-image.svg",
+                    ),
                     accentColor: "#EB6442",
                   },
                   {
                     id: "carousel",
                     title: "Carousel",
                     description: "Multi-image carousels",
-                    iconAsset: "svgs/vs-carousel.svg",
+                    iconAsset: personaAssetUrl(
+                      "visual-style/svgs/vs-carousel.svg",
+                      "svgs/vs-carousel.svg",
+                    ),
                     accentColor: "#9B79FB",
                   },
                   {
                     id: "short_form_video",
                     title: "Short-form Video",
                     description: "Reels, Shorts, TikTok",
-                    iconAsset: "svgs/vs-short-form-video.svg",
+                    iconAsset: personaAssetUrl(
+                      "visual-style/svgs/vs-short-form-video.svg",
+                      "svgs/vs-short-form-video.svg",
+                    ),
                     accentColor: "#F88F51",
                   },
                   {
                     id: "long_form_video",
                     title: "Long-form Video",
                     description: "YouTube, webinars, etc.",
-                    iconAsset: "svgs/vs-long-form-video.svg",
+                    iconAsset: personaAssetUrl(
+                      "visual-style/svgs/vs-long-form-video.svg",
+                      "svgs/vs-long-form-video.svg",
+                    ),
                     accentColor: "#62CFC9",
                   },
                   {
                     id: "story",
                     title: "Story",
                     description: "Instagram/Facebook stories",
-                    iconAsset: "svgs/vs-story.svg",
+                    iconAsset: personaAssetUrl(
+                      "visual-style/svgs/vs-story.svg",
+                      "svgs/vs-story.svg",
+                    ),
                     accentColor: "#8870E5",
                   },
                   {
                     id: "newsletter_email",
                     title: "Newsletter Email",
                     description: "Email headers & graphics",
-                    iconAsset: "svgs/vs-newsletter-email.svg",
+                    iconAsset: personaAssetUrl(
+                      "visual-style/svgs/vs-newsletter-email.svg",
+                      "svgs/vs-newsletter-email.svg",
+                    ),
                     accentColor: "#EB79AC",
                   },
                   {
                     id: "blog_post",
                     title: "Blog Post",
                     description: "Blog headers images",
-                    iconAsset: "svgs/vs-blog-post.svg",
+                    iconAsset: personaAssetUrl(
+                      "visual-style/svgs/vs-blog-post.svg",
+                      "svgs/vs-blog-post.svg",
+                    ),
                     accentColor: "#DE836C",
                   },
                   {
                     id: "poll_question",
                     title: "Poll / Question",
                     description: "Polls, questions, interactive",
-                    iconAsset: "svgs/vs-poll-question.svg",
+                    iconAsset: personaAssetUrl(
+                      "visual-style/svgs/vs-poll-question.svg",
+                      "svgs/vs-poll-question.svg",
+                    ),
                     accentColor: "#5F98D0",
                   },
                 ],
@@ -1691,43 +1780,64 @@ export const personaSchemaV1 = {
                     id: "minimalist",
                     title: "Minimalist",
                     description: "Clean lines, whitespace, restrained color",
-                    thumbnailAsset: "minimalist.png",
+                    thumbnailAsset: personaAssetUrl(
+                      "visual-style/thumbnails/minimalist.png",
+                      "minimalist.png",
+                    ),
                   },
                   {
                     id: "bold_vibrant",
                     title: "Bold & Vibrant",
                     description: "High contrast, saturated colors, strong type",
-                    thumbnailAsset: "bold-vibrant.png",
+                    thumbnailAsset: personaAssetUrl(
+                      "visual-style/thumbnails/bold-vibrant.png",
+                      "bold-vibrant.png",
+                    ),
                   },
                   {
                     id: "luxury_premium",
                     title: "Luxury / Premium",
                     description: "Dark palettes, gold accents, premium feel",
-                    thumbnailAsset: "luxury-premium.png",
+                    thumbnailAsset: personaAssetUrl(
+                      "visual-style/thumbnails/luxury-premium.png",
+                      "luxury-premium.png",
+                    ),
                   },
                   {
                     id: "human_founder_led",
                     title: "Human / Founder-Led",
                     description: "Real people, candid moments, warmth",
-                    thumbnailAsset: "human-founder-led.png",
+                    thumbnailAsset: personaAssetUrl(
+                      "visual-style/thumbnails/human-founder-led.png",
+                      "human-founder-led.png",
+                    ),
                   },
                   {
                     id: "corporate_clean",
                     title: "Corporate Clean",
                     description: "Professional, structured, trust-building",
-                    thumbnailAsset: "corporate-clean.png",
+                    thumbnailAsset: personaAssetUrl(
+                      "visual-style/thumbnails/corporate-clean.png",
+                      "corporate-clean.png",
+                    ),
                   },
                   {
                     id: "creative_artistic",
                     title: "Creative / Artistic",
                     description: "Expressive, unconventional, design-forward",
-                    thumbnailAsset: "creative-artistic.png",
+                    thumbnailAsset: personaAssetUrl(
+                      "visual-style/thumbnails/creative-artistic.png",
+                      "creative-artistic.png",
+                    ),
                   },
                   {
                     id: "dark_moody",
                     title: "Dark & Moody",
                     description: "Deep tones, dramatic lighting, cinematic",
-                    thumbnailAsset: "dark-moody.png",
+                    thumbnailAsset: personaAssetUrl(
+                      "visual-style/thumbnails/dark-moody.png",
+                      "dark-moody.png",
+                    ),
                   },
                 ],
               },
@@ -1757,27 +1867,35 @@ export const personaSchemaV1 = {
                   {
                     id: "strict",
                     label: "Strict",
-                    imageSrc:
+                    imageSrc: personaAssetUrl(
+                      "ai-design-autonomy/cards/strict.png",
                       "/media/onboarding/ai-design-autonomy/cards/strict.png",
+                    ),
                   },
                   {
                     id: "minimal",
                     label: "Minimal Changes",
-                    imageSrc:
+                    imageSrc: personaAssetUrl(
+                      "ai-design-autonomy/cards/minimal.png",
                       "/media/onboarding/ai-design-autonomy/cards/minimal.png",
+                    ),
                   },
                   {
                     id: "balanced",
                     label: "Balanced",
-                    imageSrc:
+                    imageSrc: personaAssetUrl(
+                      "ai-design-autonomy/cards/balanced.png",
                       "/media/onboarding/ai-design-autonomy/cards/balanced.png",
+                    ),
                     recommended: true,
                   },
                   {
                     id: "full_freedom",
                     label: "Full Freedom",
-                    imageSrc:
+                    imageSrc: personaAssetUrl(
+                      "ai-design-autonomy/cards/full-freedom.png",
                       "/media/onboarding/ai-design-autonomy/cards/full-freedom.png",
+                    ),
                   },
                 ],
               },
