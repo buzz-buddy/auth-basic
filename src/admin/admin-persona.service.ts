@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { PersonaSchemaService } from '../personas/persona-schema.service';
 import { UpdatePersonaComponentDto } from './dto/update-persona-component.dto';
@@ -48,7 +49,9 @@ export class AdminPersonaService {
         ...(dto.title !== undefined ? { title: dto.title } : {}),
         ...(dto.sideTitle !== undefined ? { sideTitle: dto.sideTitle } : {}),
         ...(dto.description !== undefined ? { description: dto.description } : {}),
-        ...(dto.sideInfo !== undefined ? { sideInfo: dto.sideInfo } : {}),
+        ...(dto.sideInfo !== undefined
+          ? { sideInfo: dto.sideInfo as unknown as Prisma.InputJsonValue }
+          : {}),
         ...(dto.sidePanelShortInfo !== undefined
           ? { sidePanelShortInfo: dto.sidePanelShortInfo }
           : {}),

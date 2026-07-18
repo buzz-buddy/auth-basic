@@ -8,13 +8,24 @@ export type PersonaSchemaSeedQuestion = {
   fieldConfig?: Prisma.InputJsonValue;
 };
 
+export type PersonaSideInfoItem = {
+  title: string;
+  description: string;
+};
+
+export type PersonaSideInfo = {
+  title: string;
+  description: string;
+  items?: PersonaSideInfoItem[];
+};
+
 export type PersonaSchemaSeedSubComponent = {
   slug: string;
   label: string;
   title?: string;
   sideTitle?: string;
   description?: string;
-  sideInfo?: string;
+  sideInfo?: PersonaSideInfo | null;
   sidePanelShortInfo?: string;
   sortOrder: number;
   personaQuestions?: PersonaSchemaSeedQuestion[];

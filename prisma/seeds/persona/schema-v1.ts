@@ -12,13 +12,16 @@ export const personaSchemaV1 = {
       title: "Establish who your brand is.",
       sortOrder: 1,
       personaSubComponents: [
-        { 
+        {
           slug: "basics",
           label: "Basics",
           title: "Here's what BUZZZED found",
           sideTitle: "Here's what BUZZZED found",
           description: "We analyzed your website and pre-filled your project details. Review and edit anything before continuing.",
-          sideInfo: "",
+          sideInfo: {
+            "title": "Does this look right?",
+            "description": "We pre-filled your brand details based on your website. <br /> <br /> You can edit anything before continuing."
+          },
           sidePanelShortInfo: "Pre-filled from your website — just verify and continue.",
           sortOrder: 1,
           personaQuestions: [
@@ -125,7 +128,24 @@ export const personaSchemaV1 = {
           title: "Here's what you do",
           sideTitle: "Here's what you do",
           description: "We drafted your core offer and messaging. Review and make edits if needed.",
-          sideInfo: "",
+          sideInfo: {
+            "title": "What to look for?",
+            "description": "Review the details BUZZZED pulled from your website and make changes if anything feels off.",
+            "items": [
+              {
+                "title": "Check your description",
+                "description": "Make sure your one-line summary clearly explains what your business does and who it helps."
+              },
+              {
+                "title": "Check what you sell",
+                "description": "Confirm your primary offering product, service, SaaS, education, or mixed."
+              },
+              {
+                "title": "Check your key strengths",
+                "description": "Choose up to 3 qualities you want BUZZZED to emphasize in your messaging and content."
+              }
+            ]
+          },
           sidePanelShortInfo: "A sharp one-liner is the foundation of all your content.",
           sortOrder: 2,
           personaQuestions: [
@@ -185,7 +205,24 @@ export const personaSchemaV1 = {
           title: "Here's how your brand is positioned",
           sideTitle: "Here's how your brand is positioned",
           description: "We drafted your positioning. Review and edit anything below.",
-          sideInfo: "",
+          sideInfo: {
+            title: "What to look for?",
+            description: "",
+            items: [
+              {
+                title: "Elevator pitch",
+                description: "Who, problem, outcome.",
+              },
+              {
+                title: "Mission & Vision",
+                description: "Why you exist and where you're going.",
+              },
+              {
+                title: "Brand Promise",
+                description: "What customers can always count on from you.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Strong positioning creates content that attracts the right audience.",
           sortOrder: 3,
           personaQuestions: [
@@ -288,7 +325,25 @@ export const personaSchemaV1 = {
           title: "Brand Personality",
           sideTitle: "Brand Personality",
           description: "Define your brand archetype, tone, and personality dimensions.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Why this matters?",
+            description: "",
+            items: [
+              {
+                title: "Brand archetype",
+                description: "Gives AI a personality framework to write from.",
+              },
+              {
+                title: "Personality sliders",
+                description:
+                  "Set at least 2 — they control content variation ratio.",
+              },
+              {
+                title: "Tone tags",
+                description: "Select up to 4 that feel most authentic.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Your archetype guides every content decision the AI makes.",
           sortOrder: 4,
           personaQuestions: [
@@ -420,7 +475,32 @@ export const personaSchemaV1 = {
           title: "Founder Voice",
           sideTitle: "Founder Voice",
           description: "Does a founder or CEO have a personal voice that should appear in content?",
-          sideInfo: "",
+          sideInfo: {
+            title: "What to look for?",
+            description: "",
+            items: [
+              {
+                title: "Personal vs Brand Voice",
+                description:
+                  "Decide whether content should sound like the founder or the company.",
+              },
+              {
+                title: "Authenticity",
+                description:
+                  "Use founder voice if your audience connects with personal insights and experiences.",
+              },
+              {
+                title: "Trust & Authority",
+                description:
+                  "Founder-led content can build credibility and stronger audience relationships.",
+              },
+              {
+                title: "Consistency",
+                description:
+                  "Enable this only if the founder's perspective should appear regularly across content.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Founder-led content drives 3× higher trust signals.",
           sortOrder: 5,
           personaQuestions: [
@@ -568,7 +648,25 @@ export const personaSchemaV1 = {
           title: "Audience Persona",
           sideTitle: "Audience Persona",
           description: "Build a precise profile of who you're creating content for.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Build your audience",
+            description: "",
+            items: [
+              {
+                title: "Be specific",
+                description: "Niche audiences outperform broad ones every time.",
+              },
+              {
+                title: "Pain points matter",
+                description: "What keeps them up at night?",
+              },
+              {
+                title: "B2B fields",
+                description:
+                  "Role, seniority, and company size shape tone significantly.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Be specific — the more precise, the better AI performs.",
           sortOrder: 1,
           personaQuestions: [
@@ -756,7 +854,7 @@ export const personaSchemaV1 = {
                 ],
               },
             },
-          ],     
+          ],
         },
         {
           slug: "representation",
@@ -764,7 +862,26 @@ export const personaSchemaV1 = {
           title: "Who Appears in Content?",
           sideTitle: "Who Appears in Content?",
           description: "These choices shape every visual BUZZZED generates for you.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Representation Guidelines",
+            description: "",
+            items: [
+              {
+                title: "Audience Match",
+                description: "Choose people who reflect your target audience.",
+              },
+              {
+                title: "Authenticity",
+                description:
+                  "Use real founders, customers, or team members when relevant.",
+              },
+              {
+                title: "Consistency",
+                description:
+                  "Your selections will guide all AI-generated visuals.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Representation choices shape every visual AI generates.",
           sortOrder: 2,
           personaQuestions: [
@@ -794,7 +911,24 @@ export const personaSchemaV1 = {
           title: "Goals",
           sideTitle: "Goals",
           description: "Set your primary business objective and time horizon.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Goal Planning",
+            description: "",
+            items: [
+              {
+                title: "Primary Objective",
+                description: "Choose the main outcome you want content to achieve.",
+              },
+              {
+                title: "Time Horizon",
+                description: "Set whether your goal is short-term or ongoing.",
+              },
+              {
+                title: "Content Budget",
+                description: "Helps BUZZZED tailor content volume and recommendations.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Clear goals help AI optimize every post for the right outcome.",
           sortOrder: 3,
           personaQuestions: [
@@ -853,7 +987,27 @@ export const personaSchemaV1 = {
           title: "Competitive Context",
           sideTitle: "Competitive Context",
           description: "Optional — AI analyzes competitor public content to sharpen your differentiation.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Competitive Positioning",
+            description: "",
+            items: [
+              {
+                title: "Relevant Competitors",
+                description:
+                  "Add competitors your audience actively compares you against.",
+              },
+              {
+                title: "Your Difference",
+                description:
+                  "Focus on the one thing you do better, faster, or differently.",
+              },
+              {
+                title: "Clear Positioning",
+                description:
+                  "A strong differentiation statement helps BUZZZED create more distinct content.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Optional — but competitor analysis sharpens differentiation significantly.",
           sortOrder: 4,
           personaQuestions: [
@@ -891,7 +1045,27 @@ export const personaSchemaV1 = {
           title: "Funnel Stage Content Mix",
           sideTitle: "Funnel Stage Content Mix",
           description: "How much of your content should target each stage of the funnel? Sliders are linked — they always sum to 100%.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Funnel Mix Guidance",
+            description: "",
+            items: [
+              {
+                title: "Awareness vs Conversion",
+                description:
+                  "Adjust the balance based on whether you need more reach, consideration, or sales.",
+              },
+              {
+                title: "Match Business Goals",
+                description:
+                  "Growing a brand? Increase TOFU. Driving revenue? Increase BOFU.",
+              },
+              {
+                title: "Keep It Balanced",
+                description:
+                  "A healthy mix ensures you're attracting, nurturing, and converting your audience.",
+              },
+            ],
+          },
           sidePanelShortInfo: "A 50/30/20 TOFU/MOFU/BOFU split is the most common high-performer.",
           sortOrder: 5,
           personaQuestions: [
@@ -929,7 +1103,27 @@ export const personaSchemaV1 = {
           title: "Content Pillars",
           sideTitle: "Content Pillars",
           description: "Pick 3-5 pillars, then set the weighting. AI generates content across all of them proportionally.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Content Strategy Tips",
+            description: "",
+            items: [
+              {
+                title: "Choose Core Pillars",
+                description:
+                  "Select 3–5 topics you want your brand to be known for.",
+              },
+              {
+                title: "Set Priorities",
+                description:
+                  "Higher-weighted pillars will appear more often in generated content.",
+              },
+              {
+                title: "Balance Value & Promotion",
+                description:
+                  "Focus on helping your audience first, then weave in promotional content naturally.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Pick 3–5 pillars. AI generates content across all of them weighted by your mix.",
           sortOrder: 1,
           personaQuestions: [
@@ -995,7 +1189,27 @@ export const personaSchemaV1 = {
           title: "Primary Content Mode",
           sideTitle: "Primary Content Mode",
           description: "This sets the strategic voice across all your posts.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Content Mode Guide",
+            description: "",
+            items: [
+              {
+                title: "Match Your Goal",
+                description:
+                  "Choose the content mode that best supports your primary business objective.",
+              },
+              {
+                title: "Shape Your Voice",
+                description:
+                  "This setting influences how BUZZZED frames ideas, stories, and messaging.",
+              },
+              {
+                title: "Stay Consistent",
+                description:
+                  "Your selected mode becomes the default approach across generated content.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Content mode sets the strategic voice across all your posts.",
           sortOrder: 2,
           personaQuestions: [
@@ -1153,7 +1367,27 @@ export const personaSchemaV1 = {
           title: "Compliance & Guardrails",
           sideTitle: "Compliance & Guardrails",
           description: "Set once — they apply to every piece of content BUZZZED creates.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Compliance Settings",
+            description: "",
+            items: [
+              {
+                title: "Industry Rules",
+                description:
+                  "Select any regulations or restrictions BUZZZED should follow when creating content.",
+              },
+              {
+                title: "Topics to Avoid",
+                description:
+                  "Block subjects that don't align with your brand, audience, or risk tolerance.",
+              },
+              {
+                title: "Brand Safety Level",
+                description:
+                  "Control how cautious or bold AI-generated content should be.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Guardrails protect your brand — set them once, they apply everywhere.",
           sortOrder: 3,
           personaQuestions: [
@@ -1227,7 +1461,27 @@ export const personaSchemaV1 = {
           title: "Key Dates",
           sideTitle: "Key Dates",
           description: "Optional — key dates unlock launch-campaign templates automatically.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Key Dates & Campaigns",
+            description: "",
+            items: [
+              {
+                title: "Add Important Dates",
+                description:
+                  "Include launches, events, promotions, or seasonal campaigns you want content planned around.",
+              },
+              {
+                title: "Provide Context",
+                description:
+                  "A short description helps BUZZZED create more relevant content and campaign ideas.",
+              },
+              {
+                title: "Plan Ahead",
+                description:
+                  "Adding future dates allows AI to schedule content and build momentum before key moments.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Key dates unlock launch-campaign templates automatically.",
           sortOrder: 4,
           personaQuestions: [
@@ -1275,7 +1529,27 @@ export const personaSchemaV1 = {
           title: "Platform Selection",
           sideTitle: "Where will you show up?",
           description: "Toggle platforms on. AI tailors format and tone for each one.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Platform Selection Tips",
+            description: "",
+            items: [
+              {
+                title: "Choose Active Channels",
+                description:
+                  "Enable only the platforms where you plan to publish consistently.",
+              },
+              {
+                title: "Set Realistic Frequency",
+                description:
+                  "Select a posting volume your team can maintain long term.",
+              },
+              {
+                title: "Tailor by Platform",
+                description:
+                  "Different channels serve different goals and audiences—pick the ones that matter most.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Start with 2–3 platforms and expand as you grow.",
           sortOrder: 1,
           personaQuestions: [
@@ -1349,7 +1623,26 @@ export const personaSchemaV1 = {
           title: "Schedule Preferences",
           sideTitle: "Schedule Preferences",
           description: "When will you post? AI adapts timing per platform automatically.         ",
-          sideInfo: "",
+          sideInfo: {
+            title: "What to look for?",
+            description:
+              "Choose how much control you want over publishing times.",
+            items: [
+              {
+                title: "Posting Schedule",
+                description: "Select when content should be published.",
+              },
+              {
+                title: "Posting Window",
+                description: "Choose your preferred time of day.",
+              },
+              {
+                title: "Time Zone",
+                description:
+                  "Content will be scheduled according to this location.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Consistent posting times increase algorithmic reach by up to 40%.",
           sortOrder: 2,
           personaQuestions: [
@@ -1503,7 +1796,27 @@ export const personaSchemaV1 = {
           title: "Content Formats",
           sideTitle: "Content Formats",
           description: "Select the formats you want BUZZZED to generate.         ",
-          sideInfo: "",
+          sideInfo: {
+            title: "Content Format Selection",
+            description: "",
+            items: [
+              {
+                title: "Prioritize What Works",
+                description:
+                  "Select the formats your audience engages with most.",
+              },
+              {
+                title: "Match Platform Behavior",
+                description:
+                  "Choose formats that fit your selected channels and content strategy.",
+              },
+              {
+                title: "Balance Effort & Impact",
+                description:
+                  "Mix quick-to-create formats with higher-impact content types.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Carousels drive 3× more profile visits than static images.",
           sortOrder: 3,
           personaQuestions: [
@@ -1573,7 +1886,27 @@ export const personaSchemaV1 = {
           title: "Brand Colors",
           sideTitle: "Set your brand colors.",
           description: "Set your palette. AI applies these across all generated content.",
-          sideInfo: "",
+          sideInfo: {
+            title: "Build Your Color Palette",
+            description: "",
+            items: [
+              {
+                title: "Primary Color First",
+                description:
+                  "Choose the color most associated with your brand.",
+              },
+              {
+                title: "Support With Secondary Colors",
+                description:
+                  "Use secondary colors for backgrounds, layouts, and visual variety.",
+              },
+              {
+                title: "Use Accent Colors Sparingly",
+                description:
+                  "Reserve accent colors for buttons, highlights, and key actions.",
+              },
+            ],
+          },
           sidePanelShortInfo: "A 3-color palette keeps content visually cohesive at scale.",
           sortOrder: 1,
           personaQuestions: [
@@ -1646,7 +1979,28 @@ export const personaSchemaV1 = {
           sideTitle: "Choose your typeface.",
           description:
             "Choose your display and body fonts. These appear in every headline AI generates.",
-          sideInfo: "",
+          sideInfo: {
+            title: "What to look for?",
+            description: "",
+            items: [
+              {
+                title: "Display Font Personality",
+                description: "Does this font match how your brand should feel?",
+              },
+              {
+                title: "Headline Impact",
+                description: "Will it grab attention in posts and ads?",
+              },
+              {
+                title: "Readability",
+                description: "Is it easy to read on all screen sizes?",
+              },
+              {
+                title: "Consistency",
+                description: "Does it align with your existing branding?",
+              },
+            ],
+          },
           sidePanelShortInfo: "Typography is 80% of design — choose something that feels like you.",
           sortOrder: 2,
           personaQuestions: [
@@ -1681,7 +2035,32 @@ export const personaSchemaV1 = {
           sideTitle: "Content formats",
           description:
             "Click a content format, then choose a visual style to connect them.",
-          sideInfo: "",
+          sideInfo: {
+            title: "What to look for?",
+            description: "",
+            items: [
+              {
+                title: "Format–Style Match",
+                description:
+                  "Choose visual styles that naturally fit each content format.",
+              },
+              {
+                title: "Brand Consistency",
+                description:
+                  "Keep connected styles aligned with your brand identity and audience expectations.",
+              },
+              {
+                title: "Content Purpose",
+                description:
+                  "Use different styles strategically for education, promotion, storytelling, or engagement.",
+              },
+              {
+                title: "Connection Coverage",
+                description:
+                  "Ensure your most important content formats have a defined visual style assigned.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Consistent visuals increase brand recall by 80%.",
           sortOrder: 3,
           personaQuestions: [
@@ -1851,7 +2230,32 @@ export const personaSchemaV1 = {
           sideTitle: "AI design autonomy.",
           description:
             "Control how much creative freedom the AI has with your visuals.",
-          sideInfo: "",
+          sideInfo: {
+            title: "What to look for?",
+            description: "",
+            items: [
+              {
+                title: "Full Freedom",
+                description:
+                  "Allows BUZZZED to experiment with layouts, imagery, and design styles.",
+              },
+              {
+                title: "Balanced",
+                description:
+                  "Keeps your brand recognizable while improving creativity and engagement.",
+              },
+              {
+                title: "Minimal Changes",
+                description:
+                  "Uses your existing visual style with only small enhancements.",
+              },
+              {
+                title: "Strict Brand Control",
+                description:
+                  "Follows your brand guidelines as closely as possible.",
+              },
+            ],
+          },
           sidePanelShortInfo:
             "More freedom = more creative variety. Strict = consistent brand.",
           sortOrder: 4,
@@ -1909,7 +2313,31 @@ export const personaSchemaV1 = {
           sideTitle: "Caption preferences.",
           description:
             "Set how your captions look and feel across all platforms.",
-          sideInfo: "",
+          sideInfo: {
+            title: "What to look for?",
+            description: "",
+            items: [
+              {
+                title: "Caption Length",
+                description: "Choose how detailed you want your captions to be.",
+              },
+              {
+                title: "CTA Style",
+                description:
+                  "Select how BUZZZED should encourage engagement and action.",
+              },
+              {
+                title: "Hashtag Strategy",
+                description:
+                  "Control how hashtags are used to support reach and branding.",
+              },
+              {
+                title: "Consistency",
+                description:
+                  "These preferences will be applied across all generated captions.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Caption style is one of the most impactful brand consistency signals.",
           sortOrder: 5,
           personaQuestions: [
@@ -1976,7 +2404,32 @@ export const personaSchemaV1 = {
           title: "Approval Workflow",
           sideTitle: "Approval workflow.",
           description: "How should content be approved before publishing?",
-          sideInfo: "",
+          sideInfo: {
+            title: "What to look for?",
+            description: "",
+            items: [
+              {
+                title: "Approval Mode",
+                description:
+                  "Choose who should review content before it goes live.",
+              },
+              {
+                title: "Approver Email",
+                description:
+                  "Make sure the correct teammate receives approval requests.",
+              },
+              {
+                title: "Publishing Speed",
+                description:
+                  "Balance faster publishing with the level of oversight you need.",
+              },
+              {
+                title: "Auto-Publish",
+                description:
+                  "Enable this if approved content should be published automatically.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Solo mode publishes immediately after your approval.",
           sortOrder: 6,
           personaQuestions: [
@@ -2044,7 +2497,32 @@ export const personaSchemaV1 = {
           sideTitle: "Upload brand assets.",
           description:
             "Optional — brand kit upload auto-populates colors and fonts in the next steps.",
-          sideInfo: "",
+          sideInfo: {
+            title: "What to look for?",
+            description: "",
+            items: [
+              {
+                title: "Logo Quality",
+                description:
+                  "Upload a clear, high-resolution logo for the best results.",
+              },
+              {
+                title: "Brand Guidelines",
+                description:
+                  "Add your brand kit to help AI follow your colors, fonts, and design rules.",
+              },
+              {
+                title: "Auto-Detection",
+                description:
+                  "Uploaded assets can automatically populate brand settings.",
+              },
+              {
+                title: "Keep It Consistent",
+                description:
+                  "The more brand assets you provide, the more accurate your content will be.",
+              },
+            ],
+          },
           sidePanelShortInfo: "Brand kit upload auto-populates fonts and colors in the next steps.",
           sortOrder: 7,
           personaQuestions: [

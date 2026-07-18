@@ -197,7 +197,7 @@ model PersonaSubComponent {
   title              String?
   sideTitle          String?
   description        String?
-  sideInfo           String?           @db.Text
+  sideInfo           Json?
   sidePanelShortInfo String?
   sortOrder          Int
   personaQuestions   PersonaQuestion[]
